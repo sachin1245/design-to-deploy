@@ -63,5 +63,43 @@
 			"mcp__plugin_playwright_playwright__browser_install",
 			"mcp__plugin_playwright_playwright__browser_network_requests"
 		]
+	},
+	"hooks": {
+		"PostToolUse": [
+			{
+				"matcher": "Write|Edit",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "pnpm biome check --write --unsafe \"$CLAUDE_FILE_PATH\" 2>&1 || true",
+						"timeout": 30,
+						"statusMessage": "Formatting with Biome..."
+					}
+				]
+			}
+		],
+		"Stop": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "echo '--- TypeCheck ---' && pnpm typecheck 2>&1 | tail -20 && echo '--- Lint ---' && pnpm lint 2>&1 | tail -20",
+						"timeout": 120,
+						"statusMessage": "Running verification (typecheck + lint)..."
+					}
+				]
+			}
+		],
+		"Notification": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "osascript -e 'display notification \"Claude Code task completed\" with title \"design-to-deploy\"'",
+						"timeout": 10
+					}
+				]
+			}
+		]
 	}
 }
