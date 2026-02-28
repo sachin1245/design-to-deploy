@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
@@ -31,6 +32,12 @@ export default function Home() {
           <span className="inline-flex items-center rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium text-card-foreground transition-transform hover:scale-105 active:scale-95">
             Theme System Ready
           </span>
+          <Link
+            href="/showcase"
+            className="inline-flex items-center rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium text-card-foreground transition-transform hover:scale-105 active:scale-95"
+          >
+            Component Showcase &rarr;
+          </Link>
         </div>
 
         {/* Color palette showcase */}
