@@ -52,45 +52,39 @@ Each worktree session must:
 Do NOT modify shared config files (package.json, tsconfig.json, next.config.ts)
 without explicit user approval.
 
-## Orchestrated Parallel Execution
-Run multiple issues in parallel blocks using tmux + worktrees:
+## Parallel Execution (Native Claude Code)
+Use Claude Code's built-in features instead of custom scripts:
 
+### Option 1: Worktrees (Simple Parallel Sessions)
 ```bash
-# Preview what will happen
-./scripts/orchestrate.sh --dry-run --block "42,43" --block "44,8,9"
+# Start isolated sessions for each issue
+claude -w issue-42    # Creates .claude/worktrees/issue-42/ with new branch
+claude -w issue-43    # In a separate terminal
 
-# Run with defaults ($5 budget/worker, manual merge confirmation)
-./scripts/orchestrate.sh --block "42,43" --block "44,8,9"
-
-# Higher budget + auto-wait for merges
-./scripts/orchestrate.sh --block "42,43" --block "44,8,9" --auto-merge-wait --budget 8.00
-
-# Or use the slash command (generates the shell command for you)
-# /orchestrate 42,43 | 44,8,9
+# Each session auto-cleans up when done (or prompts to keep)
 ```
 
-**Block format:** Issues within a `--block` run in parallel. Blocks run sequentially — each waits for the previous block's PRs to merge.
+### Option 2: Agent Teams (Coordinated Parallel Work)
+Enable in settings:
+```json
+// .claude/settings.json or env
+{ "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
+```
+Then ask Claude to create a team:
+```
+Create an agent team to work on issues #42, #43, and #44 in parallel.
+Spawn one teammate per issue. Each should create a feature branch,
+implement, test, and open a PR.
+```
+Agent Teams provide: shared task list, inter-agent messaging, centralized
+coordination, and automatic cleanup — no tmux required.
 
-**Options:**
-| Flag | Description |
-|------|-------------|
-| `--block "<issues>"` | Comma-separated issue numbers (repeatable) |
-| `--budget <amount>` | Max USD per worker (default: 5.00) |
-| `--auto-merge-wait` | Poll GitHub for merged PRs instead of manual Enter |
-| `--dry-run` | Preview without executing |
-
-**tmux navigation:**
-- `tmux attach -t claude-orchestrator` — attach to session
-- `Ctrl-B n` / `Ctrl-B p` — next/prev window
-- `Ctrl-B 0` — status window
-- `Ctrl-B d` — detach (workers keep running)
-
-**Status/logs:**
-- `.claude/worktrees/status/issue-N.status` — worker state
-- `.claude/worktrees/logs/issue-N.log` — full output
+### Option 3: Subagent Worktrees (Automated Isolation)
+Subagents can use `isolation: worktree` for automatic parallel execution
+within a single session. Useful for research/review tasks.
 
 ### Shared Config File Registry
-Workers must NOT modify these files without explicit justification:
+Workers/teammates must NOT modify these files without explicit justification:
 - `package.json` / `pnpm-lock.yaml`
 - `tsconfig.json`, `next.config.ts`, `tailwind.config.ts`
 - `vitest.config.ts`, `playwright.config.ts`
