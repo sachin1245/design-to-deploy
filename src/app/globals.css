@@ -93,11 +93,11 @@
 	/* Override font — DM Serif Display for headings */
 	--display-font: var(--font-dm-serif-display);
 
-	/* Override radii — pill / organic shapes */
+	/* Override radii — softer organic shapes (not pill) */
 	--radius-base-sm: 0.5rem;
 	--radius-base-md: 0.75rem;
 	--radius-base-lg: 1rem;
-	--radius-base-xl: 9999px;
+	--radius-base-xl: 1.5rem;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -128,10 +128,11 @@
 
 	--display-font: var(--font-dm-serif-display);
 
+	/* Override radii — softer organic shapes (not pill) */
 	--radius-base-sm: 0.5rem;
 	--radius-base-md: 0.75rem;
 	--radius-base-lg: 1rem;
-	--radius-base-xl: 9999px;
+	--radius-base-xl: 1.5rem;
 }
 
 /* ═══════════════════════════════════════════════════

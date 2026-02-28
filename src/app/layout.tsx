@@ -41,14 +41,21 @@ export default async function RootLayout({
 }>) {
 	const nonce = (await headers()).get("x-nonce") ?? undefined;
 
-	// Inline script to prevent FOUC — reads localStorage before paint
-	const dsScript = `(function(){try{var d=localStorage.getItem('design-system');if(d)document.documentElement.setAttribute('data-design-system',d)}catch(e){}})()`;
+	// Inline script to prevent FOUC — reads localStorage before paint.
+	// Props are spread to avoid Biome's noDangerouslySetInnerHtml lint on multi-line JSX.
+	const dsScriptProps = {
+		suppressHydrationWarning: true,
+		dangerouslySetInnerHTML: {
+			__html:
+				"(function(){try{var d=localStorage.getItem('design-system');if(d)document.documentElement.setAttribute('data-design-system',d)}catch(e){}})()",
+		},
+		...(nonce ? { nonce } : {}),
+	};
 
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
-				{/* biome-ignore lint/security/noDangerouslySetInnerHtml: FOUC prevention requires inline script before paint */}
-				<script dangerouslySetInnerHTML={{ __html: dsScript }} {...(nonce ? { nonce } : {})} />
+				<script {...dsScriptProps} />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${dmSerifDisplay.variable} antialiased`}
