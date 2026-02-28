@@ -1,3 +1,4 @@
+import { DesignSystemToggle } from "@/components/design-system-toggle";
 import { CtaSection } from "@/components/landing/cta-section";
 import { Features } from "@/components/landing/features";
 import { Footer } from "@/components/landing/footer";
@@ -15,7 +16,8 @@ export default function LandingPage() {
 	return (
 		<div className="min-h-screen">
 			{/* Floating header */}
-			<header className="fixed right-6 top-6 z-50 sm:right-8">
+			<header className="fixed right-6 top-6 z-50 flex items-center gap-3 sm:right-8">
+				<DesignSystemToggle />
 				<ThemeToggle />
 			</header>
 

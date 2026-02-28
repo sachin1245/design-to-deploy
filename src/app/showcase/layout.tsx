@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DesignSystemToggle } from "@/components/design-system-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
@@ -40,7 +41,10 @@ export default function ShowcaseLayout({ children }: { children: React.ReactNode
 						</span>
 						<span className="font-display text-sm font-semibold tracking-wide">Showcase</span>
 					</nav>
-					<ThemeToggle />
+					<div className="flex items-center gap-3">
+						<DesignSystemToggle />
+						<ThemeToggle />
+					</div>
 				</div>
 			</header>
 
