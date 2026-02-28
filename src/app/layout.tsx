@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { headers } from "next/headers";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -26,17 +27,19 @@ export const metadata: Metadata = {
 	description: "From pixel to production.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const nonce = (await headers()).get("x-nonce") ?? undefined;
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} antialiased`}
 			>
-				<ThemeProvider>{children}</ThemeProvider>
+				<ThemeProvider {...(nonce ? { nonce } : {})}>{children}</ThemeProvider>
 				<Analytics />
 				<SpeedInsights />
 			</body>
