@@ -108,3 +108,34 @@ Use `frontend-design` for:
 - Any JSX/TSX that renders visible UI elements
 
 **Workflow**: Always invoke `frontend-design` skill first → get design guidance → then implement the code. Never skip this step.
+
+## MCP Servers
+
+Two MCP servers are configured in `.mcp.json` for browser automation and design integration.
+
+### Playwright MCP (Local)
+- **Server**: `@anthropic-ai/mcp-playwright` (runs locally via npx)
+- **Rate limits**: None — unlimited usage
+- **Capabilities**: Navigate to URLs, take screenshots, click/type/interact with pages, evaluate JS, resize viewport
+- **Tools prefix**: `mcp__plugin_playwright_playwright__*`
+- **Use for**: Visual verification, E2E testing, capturing rendered component screenshots, responsive design checks
+
+### Figma MCP (Remote)
+- **Server**: `https://mcp.figma.com/mcp` (remote HTTP)
+- **Auth**: OAuth popup — first Figma tool call triggers a browser popup, click "Allow" to authenticate
+- **Rate limits**: Free tier = 6 MCP calls/month. Be strategic with calls.
+- **Capabilities**: Read designs, generate design system rules, create FigJam diagrams, manage Code Connect mappings
+- **Tools prefix**: `mcp__claude_ai_Figma__*`
+- **Key tools**:
+  - `whoami` — Verify authentication
+  - `get_design_context` — Extract design code + screenshot from a Figma node
+  - `get_screenshot` — Visual reference of a Figma node
+  - `create_design_system_rules` — Generate project-specific design system rules
+  - `generate_diagram` — Create diagrams in FigJam
+  - `add_code_connect_map` — Link Figma components to code files
+- **Use Playwright instead of Figma** for screenshots of running app (saves Figma calls)
+
+### Design Workflow (Figma ↔ Code)
+1. **Figma → Code**: `get_design_context(nodeId, fileKey)` → adapt output to project stack
+2. **Code → Visual**: Use Playwright to screenshot running app at multiple viewports
+3. **Code Connect**: Map components via `add_code_connect_map` (deferred until Figma plan upgrade)
