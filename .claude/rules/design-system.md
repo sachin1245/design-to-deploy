@@ -82,6 +82,9 @@ Part.displayName = "Part";
 - ARIA attributes where needed (`role`, `aria-label`, `aria-expanded`, etc.)
 - Keyboard navigation support
 - Focus visible indicators via `focus-visible:ring-2 focus-visible:ring-ring`
+- **Unique landmark labels**: When a page has multiple `<nav>`, `<aside>`, or `<section>` elements, each MUST have a unique `aria-label` (e.g., `aria-label="Main navigation"`, `aria-label="Footer navigation"`). This is required for both Lighthouse accessibility scoring and Playwright locator disambiguation.
+- **Form control labels**: Every `<input>`, `<select>`, `<textarea>`, toggle, slider, and progress bar MUST have an associated `<label>` or `aria-label`. Showcase/demo instances are not exempt.
+- **Avoid opacity-based text colors**: Do not use `text-*/<opacity>` (e.g., `text-primary/50`) for readable text — it often violates WCAG AA 4.5:1 contrast. Use semantic tokens like `text-muted-foreground` instead.
 
 ## Component Count: 36
 Foundational (11) | Form Controls (6) | Feedback (5) | Navigation (6) | Data & Composite (8)

@@ -40,6 +40,43 @@ globs:
 - Test user flows, not individual components
 - Use `test.beforeEach` to navigate to the page under test
 
+### Strict Mode & Locator Precision (CRITICAL)
+Playwright runs in strict mode by default — if a locator matches multiple elements, the test **throws an error** instead of silently picking the first match. Every locator must resolve to exactly one element.
+
+**Rules to prevent strict mode violations:**
+
+1. **Always use `{ exact: true }` with `getByText()`** when the text might appear as a substring elsewhere on the page (footer, breadcrumbs, descriptions). Default to `{ exact: true }` unless you specifically need substring matching.
+   ```ts
+   // BAD — "React 19" matches card title AND footer copyright
+   await expect(page.getByText("React 19")).toBeVisible();
+   // GOOD
+   await expect(page.getByText("React 19", { exact: true })).toBeVisible();
+   ```
+
+2. **Scope locators to a parent landmark or container** when the same text/role appears in multiple page regions (nav, footer, sidebar). Use chained locators:
+   ```ts
+   // BAD — "Home" link exists in both nav and footer
+   await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
+   // GOOD — scope to the specific navigation
+   const nav = page.getByRole("navigation", { name: "Main" });
+   await expect(nav.getByRole("link", { name: "Home" })).toBeVisible();
+   ```
+
+3. **Prefer `getByRole` with `name` over `getByText`** — roles are more specific and less prone to accidental duplicates:
+   ```ts
+   // OK but fragile
+   await expect(page.getByText("Components", { exact: true })).toBeVisible();
+   // BETTER — targets the specific heading
+   await expect(page.getByRole("heading", { name: "Components" })).toBeVisible();
+   ```
+
+4. **Use `page.locator()` with CSS/data attributes as last resort** when semantic locators can't disambiguate:
+   ```ts
+   await expect(page.locator("[data-testid='stat-components']")).toBeVisible();
+   ```
+
+5. **Watch out for common duplicate sources**: footer links mirror nav links, breadcrumbs repeat page names, descriptions contain keyword substrings, copyright text contains tech names.
+
 ## Visual Regression Tests
 - Location: `tests/visual/`
 - Baselines: `tests/visual/__snapshots__/`
