@@ -52,11 +52,16 @@ test.describe("App Pages", () => {
 
 		test("displays tech stack section", async ({ page }) => {
 			await page.goto("/about");
-			await expect(page.getByText("Tech Stack")).toBeVisible();
-			await expect(page.getByText("Next.js 15", { exact: true })).toBeVisible();
-			await expect(page.getByText("React 19", { exact: true })).toBeVisible();
-			await expect(page.getByText("TypeScript", { exact: true })).toBeVisible();
-			await expect(page.getByText("Tailwind CSS v4", { exact: true })).toBeVisible();
+			// Scope to the tech stack section to avoid matching "By the Numbers" stats
+			const techSection = page
+				.locator("section")
+				.filter({ has: page.getByText("Tech Stack") })
+				.first();
+			await expect(techSection).toBeVisible();
+			await expect(techSection.getByText("Next.js 15")).toBeVisible();
+			await expect(techSection.getByText("React 19")).toBeVisible();
+			await expect(techSection.getByText("TypeScript")).toBeVisible();
+			await expect(techSection.getByText("Tailwind CSS v4")).toBeVisible();
 		});
 
 		test("displays team section", async ({ page }) => {
