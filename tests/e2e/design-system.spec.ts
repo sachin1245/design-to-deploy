@@ -94,8 +94,8 @@ test.describe("Design System Switching", () => {
 		const group = page.getByRole("group", { name: /design system/i });
 		await group.getByRole("button", { name: /area/i }).click();
 
-		// Navigate to showcase
-		await page.getByRole("link", { name: /Component Showcase/i }).click();
+		// Navigate to showcase (link text changed in route group refactor)
+		await page.getByRole("link", { name: /Browse Components|Component Showcase/i }).click();
 		await expect(page).toHaveURL(/\/showcase/);
 
 		// Should still be Area
