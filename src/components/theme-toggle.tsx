@@ -77,7 +77,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 
 	const current = (theme ?? "system") as (typeof themes)[number];
 	const nextIndex = (themes.indexOf(current) + 1) % themes.length;
-	const next = themes[nextIndex];
+	const next = themes[nextIndex] ?? "system";
 
 	const Icon = icons[current];
 
