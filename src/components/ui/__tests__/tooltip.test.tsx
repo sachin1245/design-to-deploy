@@ -43,7 +43,8 @@ describe("Tooltip", () => {
 		);
 		const wrapper = screen.getByText("Hover").closest("[class]") as HTMLElement;
 		fireEvent.mouseEnter(wrapper);
-		await new Promise((r) => setTimeout(r, 10));
+		// Wait for setTimeout(fn, 0) to fire — needs multiple ticks in JSDOM
+		await new Promise((r) => setTimeout(r, 50));
 		expect(screen.getByRole("tooltip")).toBeInTheDocument();
 		fireEvent.mouseLeave(wrapper);
 		expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
