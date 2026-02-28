@@ -8,7 +8,7 @@ test.describe("Navigation", () => {
 
 	test("can navigate to /showcase", async ({ page }) => {
 		await page.goto("/");
-		await page.getByRole("link", { name: /Component Showcase/i }).click();
+		await page.getByRole("link", { name: /Browse Components/i }).click();
 		await expect(page).toHaveURL(/\/showcase/);
 		await expect(page.getByRole("heading", { name: /Component.*Showcase/ })).toBeVisible();
 	});
@@ -17,6 +17,6 @@ test.describe("Navigation", () => {
 		await page.goto("/showcase");
 		await page.getByRole("banner").getByRole("link", { name: /Home/i }).click();
 		await expect(page).toHaveURL("/");
-		await expect(page.getByRole("heading", { name: /design.*to.*deploy/i })).toBeVisible();
+		await expect(page.getByRole("heading", { name: /design tokens/i })).toBeVisible();
 	});
 });
