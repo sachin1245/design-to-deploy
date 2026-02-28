@@ -14,7 +14,7 @@ export default function ShowcaseLayout({ children }: { children: React.ReactNode
 			{/* ── Sticky header with breadcrumb nav ────────── */}
 			<header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
 				<div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-					<nav className="flex items-center gap-3">
+					<nav aria-label="Breadcrumb" className="flex items-center gap-3">
 						<Link
 							href="/"
 							className="group flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"

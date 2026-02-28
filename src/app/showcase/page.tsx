@@ -87,7 +87,7 @@ function SectionHeading({
 	return (
 		<div className="mb-8">
 			<div className="flex items-baseline gap-3">
-				<span className="font-mono text-xs font-semibold text-primary/50">{number}</span>
+				<span className="font-mono text-xs font-semibold text-muted-foreground">{number}</span>
 				<h2 className="font-display text-2xl font-bold tracking-tight">{title}</h2>
 			</div>
 			<p className="mt-1.5 text-sm text-muted-foreground">{description}</p>
@@ -161,7 +161,7 @@ export default function ShowcasePage() {
 					description="Text fields with optional labels, error messages, and disabled state."
 				/>
 				<div className="grid max-w-2xl gap-6 sm:grid-cols-2">
-					<Input placeholder="Default input" />
+					<Input placeholder="Default input" aria-label="Default input" />
 					<Input label="Email" placeholder="you@example.com" type="email" />
 					<Input label="Username" error="This username is already taken" defaultValue="designbot" />
 					<Input label="Disabled" placeholder="Read-only field" disabled />
@@ -359,10 +359,10 @@ export default function ShowcasePage() {
 					description="Determinate progress with size and color variants."
 				/>
 				<div className="space-y-4 max-w-md">
-					<Progress value={25} size="sm" />
-					<Progress value={50} size="md" />
-					<Progress value={75} size="lg" variant="accent" />
-					<Progress value={90} variant="destructive" />
+					<Progress value={25} size="sm" aria-label="Progress 25%" />
+					<Progress value={50} size="md" aria-label="Progress 50%" />
+					<Progress value={75} size="lg" variant="accent" aria-label="Progress 75%" />
+					<Progress value={90} variant="destructive" aria-label="Progress 90%" />
 				</div>
 			</section>
 
@@ -466,9 +466,24 @@ export default function ShowcasePage() {
 					description="On/off switch in 3 sizes."
 				/>
 				<div className="flex items-center gap-6">
-					<Toggle size="sm" checked={toggleOn} onCheckedChange={setToggleOn} />
-					<Toggle size="md" checked={toggleOn} onCheckedChange={setToggleOn} />
-					<Toggle size="lg" checked={toggleOn} onCheckedChange={setToggleOn} />
+					<Toggle
+						size="sm"
+						checked={toggleOn}
+						onCheckedChange={setToggleOn}
+						aria-label="Toggle small"
+					/>
+					<Toggle
+						size="md"
+						checked={toggleOn}
+						onCheckedChange={setToggleOn}
+						aria-label="Toggle medium"
+					/>
+					<Toggle
+						size="lg"
+						checked={toggleOn}
+						onCheckedChange={setToggleOn}
+						aria-label="Toggle large"
+					/>
 					<span className="text-sm text-muted-foreground">{toggleOn ? "On" : "Off"}</span>
 				</div>
 			</section>
@@ -483,9 +498,9 @@ export default function ShowcasePage() {
 					description="Range input with size variants."
 				/>
 				<div className="space-y-4 max-w-sm">
-					<Slider size="sm" defaultValue={25} min={0} max={100} />
-					<Slider size="md" defaultValue={50} min={0} max={100} />
-					<Slider size="lg" defaultValue={75} min={0} max={100} />
+					<Slider size="sm" defaultValue={25} min={0} max={100} aria-label="Slider small" />
+					<Slider size="md" defaultValue={50} min={0} max={100} aria-label="Slider medium" />
+					<Slider size="lg" defaultValue={75} min={0} max={100} aria-label="Slider large" />
 				</div>
 			</section>
 
@@ -662,6 +677,7 @@ export default function ShowcasePage() {
 						{ label: "Components", href: "/showcase" },
 						{ label: "Breadcrumb" },
 					]}
+					aria-label="Breadcrumb example"
 				/>
 			</section>
 
@@ -715,6 +731,7 @@ export default function ShowcasePage() {
 						{ label: "Settings", href: "#" },
 					]}
 					className="rounded-lg"
+					aria-label="Main navigation example"
 				/>
 			</section>
 
@@ -730,6 +747,7 @@ export default function ShowcasePage() {
 				<div className="max-w-xs rounded-lg border border-border">
 					<SidebarNav
 						collapsible
+						aria-label="Sidebar navigation example"
 						sections={[
 							{
 								title: "Main",
@@ -872,14 +890,16 @@ export default function ShowcasePage() {
 					title="Toolbar"
 					description="Horizontal action bar with buttons and separators."
 				/>
-				<Toolbar>
-					<ToolbarButton active>B</ToolbarButton>
-					<ToolbarButton>I</ToolbarButton>
-					<ToolbarButton>U</ToolbarButton>
+				<Toolbar aria-label="Text formatting">
+					<ToolbarButton active aria-label="Bold">
+						B
+					</ToolbarButton>
+					<ToolbarButton aria-label="Italic">I</ToolbarButton>
+					<ToolbarButton aria-label="Underline">U</ToolbarButton>
 					<ToolbarSeparator />
-					<ToolbarButton>L</ToolbarButton>
-					<ToolbarButton>C</ToolbarButton>
-					<ToolbarButton>R</ToolbarButton>
+					<ToolbarButton aria-label="Align left">L</ToolbarButton>
+					<ToolbarButton aria-label="Align center">C</ToolbarButton>
+					<ToolbarButton aria-label="Align right">R</ToolbarButton>
 				</Toolbar>
 			</section>
 
