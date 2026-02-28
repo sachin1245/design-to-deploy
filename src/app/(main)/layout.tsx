@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DesignSystemToggle } from "@/components/design-system-toggle";
 import { MobileNav } from "@/components/mobile-nav";
 import { NavLinks } from "@/components/nav-links";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -32,6 +33,7 @@ export default function MainLayout({
 						<NavLinks />
 					</div>
 					<div className="flex items-center gap-2">
+						<DesignSystemToggle />
 						<ThemeToggle />
 						<MobileNav />
 					</div>

@@ -25,6 +25,15 @@
 	--border: #e8e0f0;
 	--input: #e8e0f0;
 	--ring: #7c3aed;
+
+	/* Font indirection — overridable per design system */
+	--display-font: var(--font-space-grotesk);
+
+	/* Radius indirection — overridable per design system */
+	--radius-base-sm: 0.375rem;
+	--radius-base-md: 0.5rem;
+	--radius-base-lg: 0.75rem;
+	--radius-base-xl: 1rem;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -52,6 +61,77 @@
 	--border: #352f4a;
 	--input: #352f4a;
 	--ring: #a78bfa;
+}
+
+/* ═══════════════════════════════════════════════════
+   Design Tokens — "Area" Theme (Light)
+   Nature-inspired editorial aesthetic:
+   olive greens, warm cream, sage accents, serif display
+   ═══════════════════════════════════════════════════ */
+
+[data-design-system="area"] {
+	--background: #f5f3ee;
+	--foreground: #2c2c28;
+	--card: #faf9f6;
+	--card-foreground: #2c2c28;
+	--popover: #faf9f6;
+	--popover-foreground: #2c2c28;
+	--primary: #6b7a2f;
+	--primary-foreground: #f5f3ee;
+	--secondary: #e8ebd8;
+	--secondary-foreground: #4a5520;
+	--muted: #edebd6;
+	--muted-foreground: #7a776a;
+	--accent: #c8842d;
+	--accent-foreground: #3a1f00;
+	--destructive: #c4453a;
+	--destructive-foreground: #ffffff;
+	--border: #d8d4c8;
+	--input: #d8d4c8;
+	--ring: #6b7a2f;
+
+	/* Override font — DM Serif Display for headings */
+	--display-font: var(--font-dm-serif-display);
+
+	/* Override radii — pill / organic shapes */
+	--radius-base-sm: 0.5rem;
+	--radius-base-md: 0.75rem;
+	--radius-base-lg: 1rem;
+	--radius-base-xl: 9999px;
+}
+
+/* ═══════════════════════════════════════════════════
+   Design Tokens — "Area" Theme (Dark)
+   Deep olive-tinted dark with warm sage accents
+   ═══════════════════════════════════════════════════ */
+
+[data-design-system="area"].dark {
+	--background: #1a1c16;
+	--foreground: #e8e5dc;
+	--card: #242620;
+	--card-foreground: #e8e5dc;
+	--popover: #242620;
+	--popover-foreground: #e8e5dc;
+	--primary: #a3b55c;
+	--primary-foreground: #1a1c16;
+	--secondary: #2e3126;
+	--secondary-foreground: #c5d48a;
+	--muted: #2e3126;
+	--muted-foreground: #9a9688;
+	--accent: #daa04c;
+	--accent-foreground: #1a0f00;
+	--destructive: #e87068;
+	--destructive-foreground: #1c0c0a;
+	--border: #3d4034;
+	--input: #3d4034;
+	--ring: #a3b55c;
+
+	--display-font: var(--font-dm-serif-display);
+
+	--radius-base-sm: 0.5rem;
+	--radius-base-md: 0.75rem;
+	--radius-base-lg: 1rem;
+	--radius-base-xl: 9999px;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -100,13 +180,13 @@
 	/* Fonts */
 	--font-sans: var(--font-geist-sans);
 	--font-mono: var(--font-geist-mono);
-	--font-display: var(--font-space-grotesk);
+	--font-display: var(--display-font);
 
-	/* Border Radius */
-	--radius-sm: 0.375rem;
-	--radius-md: 0.5rem;
-	--radius-lg: 0.75rem;
-	--radius-xl: 1rem;
+	/* Border Radius — via indirection for design system swapping */
+	--radius-sm: var(--radius-base-sm);
+	--radius-md: var(--radius-base-md);
+	--radius-lg: var(--radius-base-lg);
+	--radius-xl: var(--radius-base-xl);
 }
 
 /* ═══════════════════════════════════════════════════
