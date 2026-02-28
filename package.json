@@ -14,6 +14,7 @@
 		"test:unit:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"test:e2e": "playwright test --config=playwright.config.ts",
+		"test:integration": "vitest run --config vitest.config.ts src/app/api/",
 		"analyze": "ANALYZE=true pnpm build"
 	},
 	"dependencies": {
