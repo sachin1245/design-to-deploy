@@ -247,8 +247,9 @@ spawn_worker() {
 
   # Create a new tmux window for this worker
   # CRITICAL: unset CLAUDECODE so claude can run in tmux pane
+  # Use bypassPermissions for fully autonomous execution — workers run unattended in tmux
   tmux new-window -t "$TMUX_SESSION" -n "issue-${issue}" \
-    "cd $PROJECT_ROOT && unset CLAUDECODE && echo 'Starting worker for issue #${issue}...' && claude -p -w ${worktree_name} --permission-mode acceptEdits --max-budget-usd ${BUDGET} \"${prompt}\" 2>&1 | tee ${log_file}; echo \$? > ${STATUS_DIR}/issue-${issue}.exitcode; if [ \$? -eq 0 ]; then echo completed > ${STATUS_DIR}/issue-${issue}.status; else echo failed > ${STATUS_DIR}/issue-${issue}.status; fi; echo 'Worker finished. Press Enter to close.'; read"
+    "cd $PROJECT_ROOT && unset CLAUDECODE && echo 'Starting worker for issue #${issue}...' && claude -p -w ${worktree_name} --permission-mode bypassPermissions --max-budget-usd ${BUDGET} \"${prompt}\" 2>&1 | tee ${log_file}; echo \$? > ${STATUS_DIR}/issue-${issue}.exitcode; if [ \$? -eq 0 ]; then echo completed > ${STATUS_DIR}/issue-${issue}.status; else echo failed > ${STATUS_DIR}/issue-${issue}.status; fi; echo 'Worker finished. Press Enter to close.'; read"
 
   set_status "$issue" "running"
   log_info "Spawned worker for issue #${issue} (window: issue-${issue})"
@@ -344,7 +345,7 @@ run_block() {
     for issue in "${issues[@]}"; do
       issue=$(echo "$issue" | xargs) # trim whitespace
       log_info "[DRY RUN] Would spawn worker for issue #${issue}"
-      log_info "  Command: unset CLAUDECODE && claude -p -w issue-${issue} --permission-mode acceptEdits --max-budget-usd ${BUDGET} \"<prompt>\""
+      log_info "  Command: unset CLAUDECODE && claude -p -w issue-${issue} --permission-mode bypassPermissions --max-budget-usd ${BUDGET} \"<prompt>\""
       log_info "  Log: ${LOG_DIR}/issue-${issue}.log"
       log_info "  Status: ${STATUS_DIR}/issue-${issue}.status"
     done
