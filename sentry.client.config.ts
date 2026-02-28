@@ -5,6 +5,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
+	// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation
 	dsn: process.env["NEXT_PUBLIC_SENTRY_DSN"],
 
 	// Define how likely traces are sampled. Adjust this value in production,

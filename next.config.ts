@@ -14,10 +14,13 @@ export default withSentryConfig(analyzer(nextConfig), {
 	// For all available options, see:
 	// https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
+	// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation
 	org: process.env["SENTRY_ORG"] ?? "",
+	// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation
 	project: process.env["SENTRY_PROJECT"] ?? "",
 
 	// Only print logs for uploading source maps in CI
+	// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation
 	silent: !process.env["CI"],
 
 	// Upload a larger set of source maps for prettier stack traces (increases build time)
