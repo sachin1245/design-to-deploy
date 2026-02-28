@@ -2,10 +2,20 @@
   "permissions": {
     "allow": [
       "Bash(npm run *)",
+      "Bash(pnpm *)",
       "Bash(npx vitest *)",
       "Bash(npx playwright *)",
       "Bash(npx tsc *)",
       "Bash(npx next *)",
+      "Bash(npx biome *)",
+      "Bash(gh issue view *)",
+      "Bash(gh pr create *)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(git status)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
       "Edit(src/**)",
       "Edit(tests/**)",
       "Edit(.github/**)"

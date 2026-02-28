@@ -33,6 +33,21 @@ npm run test:all      # Everything
 - Feature branches: `feature/<issue-number>-<short-description>`
 - Bug fix branches: `fix/<issue-number>-<short-description>`
 
+## Parallel Session Workflow
+Use git worktrees for parallel Claude sessions:
+```bash
+claude -w issue-<number>    # Creates isolated worktree
+```
+Each worktree session must:
+1. Run `pnpm install` first
+2. Stay focused on the assigned issue only
+3. Use a unique dev server port if needed: `PORT=300X pnpm dev`
+4. Run full verification before committing
+5. Create PR with `gh pr create` targeting `main`
+
+Do NOT modify shared config files (package.json, tsconfig.json, next.config.ts)
+without explicit user approval.
+
 ## Mandatory Skills
 
 ### frontend-design Skill (REQUIRED)
