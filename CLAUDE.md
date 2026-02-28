@@ -18,14 +18,16 @@
 
 ## Verification Commands
 ```bash
-npm run dev           # Start dev server
-npm run build         # Production build
-npm run typecheck     # TypeScript check
-npm run lint          # ESLint
-npm run test:unit     # Unit tests
-npm run test:e2e      # E2E tests
-npm run test:visual   # Visual regression
-npm run test:all      # Everything
+pnpm dev              # Start dev server
+pnpm build            # Production build
+pnpm typecheck        # TypeScript check
+pnpm lint             # Biome lint + format check
+pnpm lint:fix         # Auto-fix lint + format issues
+pnpm format           # Format files with Biome
+pnpm test:unit        # Unit tests
+pnpm test:e2e         # E2E tests
+pnpm test:visual      # Visual regression
+pnpm test:all         # Everything
 ```
 
 ## Branch Strategy
