@@ -1,5 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation
 const CI = process.env["CI"];
 const PORT = CI ? 3000 : 3100;
 

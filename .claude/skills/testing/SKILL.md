@@ -45,15 +45,19 @@ Playwright runs in strict mode by default — if a locator matches multiple elem
 
 **Rules to prevent strict mode violations:**
 
-1. **Always use `{ exact: true }` with `getByText()`** when the text might appear as a substring elsewhere on the page (footer, breadcrumbs, descriptions). Default to `{ exact: true }` unless you specifically need substring matching.
+1. **Scope locators to a parent section first** — this is the most reliable approach when text appears in multiple page regions. Use `page.locator("section").filter(...)` to narrow the search:
    ```ts
-   // BAD — "React 19" matches card title AND footer copyright
-   await expect(page.getByText("React 19")).toBeVisible();
-   // GOOD
-   await expect(page.getByText("React 19", { exact: true })).toBeVisible();
+   // BAD — "TypeScript" exists in both Tech Stack cards AND "By the Numbers" stats
+   await expect(page.getByText("TypeScript", { exact: true })).toBeVisible(); // STILL FAILS!
+   // GOOD — scope to the specific section
+   const techSection = page.locator("section").filter({ has: page.getByText("Tech Stack") }).first();
+   await expect(techSection.getByText("TypeScript")).toBeVisible();
    ```
+   NOTE: `{ exact: true }` only prevents **substring** matching. It does NOT help when two **different elements** contain the **exact same text**. Scoping is the only reliable fix.
 
-2. **Scope locators to a parent landmark or container** when the same text/role appears in multiple page regions (nav, footer, sidebar). Use chained locators:
+2. **Use `{ exact: true }` as a secondary defense** — add it when text might appear as a substring elsewhere (e.g., "React" inside "React 19"). But never rely on it as the sole fix.
+
+3. **Scope to landmarks for navigation elements** — when the same link/role appears in multiple page regions (nav, footer, sidebar). Use chained locators:
    ```ts
    // BAD — "Home" link exists in both nav and footer
    await expect(page.getByRole("link", { name: "Home" })).toBeVisible();

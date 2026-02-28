@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
 };
 
 const analyzer = withBundleAnalyzer({
+	// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation
 	enabled: process.env["ANALYZE"] === "true",
 });
 

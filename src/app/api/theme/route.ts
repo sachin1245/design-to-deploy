@@ -13,12 +13,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
 	const body = (await request.json()) as Record<string, unknown>;
+	// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation
 	const theme = typeof body["theme"] === "string" ? body["theme"] : DEFAULT_THEME;
 
 	const cookieStore = await cookies();
 	cookieStore.set(THEME_COOKIE, theme, {
 		httpOnly: true,
-		secure: process.env["NODE_ENV"] === "production",
+		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
 		path: "/",
 		maxAge: 60 * 60 * 24 * 365, // 1 year
