@@ -4,7 +4,7 @@ const CI = process.env["CI"];
 const PORT = CI ? 3000 : 3100;
 
 export default defineConfig({
-	testDir: "./tests/e2e",
+	testDir: "./tests",
 	fullyParallel: true,
 	forbidOnly: !!CI,
 	retries: CI ? 1 : 0,
@@ -14,6 +14,13 @@ export default defineConfig({
 		baseURL: `http://localhost:${PORT}`,
 		trace: "on-first-retry",
 	},
+	expect: {
+		toHaveScreenshot: {
+			threshold: 0.2,
+			maxDiffPixels: 100,
+		},
+	},
+	snapshotPathTemplate: "{testDir}/{testFileDir}/__snapshots__/{testFileName}/{arg}{ext}",
 	projects: [
 		{
 			name: "chromium",
