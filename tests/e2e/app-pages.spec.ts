@@ -53,10 +53,10 @@ test.describe("App Pages", () => {
 		test("displays tech stack section", async ({ page }) => {
 			await page.goto("/about");
 			await expect(page.getByText("Tech Stack")).toBeVisible();
-			await expect(page.getByText("Next.js 15")).toBeVisible();
+			await expect(page.getByText("Next.js 15", { exact: true })).toBeVisible();
 			await expect(page.getByText("React 19", { exact: true })).toBeVisible();
-			await expect(page.getByText("TypeScript")).toBeVisible();
-			await expect(page.getByText("Tailwind CSS v4")).toBeVisible();
+			await expect(page.getByText("TypeScript", { exact: true })).toBeVisible();
+			await expect(page.getByText("Tailwind CSS v4", { exact: true })).toBeVisible();
 		});
 
 		test("displays team section", async ({ page }) => {
