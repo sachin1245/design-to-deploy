@@ -79,9 +79,11 @@ implement, test, and open a PR.
 Agent Teams provide: shared task list, inter-agent messaging, centralized
 coordination, and automatic cleanup — no tmux required.
 
-### Option 3: Subagent Worktrees (Automated Isolation)
-Subagents can use `isolation: worktree` for automatic parallel execution
-within a single session. Useful for research/review tasks.
+### Option 3: Subagent Worktrees (Recommended for Automated Parallel Execution)
+Use `/orchestrate <issue-numbers>` to spawn parallel subagents, each in an
+isolated worktree. The orchestrator validates issues, spawns agents with
+`isolation: worktree` and `run_in_background: true`, and reports results.
+Example: `/orchestrate 19,20,21` or `/orchestrate 16,17 | 18,19` for sequential blocks.
 
 ### Shared Config File Registry
 Workers/teammates must NOT modify these files without explicit justification:
