@@ -125,3 +125,23 @@ export const shadows = {
 } as const;
 
 export type ShadowScale = keyof typeof shadows;
+
+// ─── Motion ─────────────────────────────────────────────────────────
+
+export const duration = {
+	instant: "50ms",
+	fast: "150ms",
+	normal: "250ms",
+	slow: "400ms",
+	slower: "600ms",
+} as const;
+
+export type DurationScale = keyof typeof duration;
+
+export const easing = {
+	default: "cubic-bezier(0.2, 0, 0, 1)",
+	spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+	out: "cubic-bezier(0.16, 1, 0.3, 1)",
+} as const;
+
+export type EasingCurve = keyof typeof easing;
