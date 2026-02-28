@@ -27,3 +27,5 @@ export {
 } from "./dialog";
 export type { InputProps } from "./input";
 export { Input } from "./input";
+export type { TestCompProps } from "./test-comp";
+export { TestComp, testCompVariants } from "./test-comp";

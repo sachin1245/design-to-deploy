@@ -19,6 +19,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 	Input,
+	TestComp,
 } from "@/components/ui";
 
 /* ═══════════════════════════════════════════════════
@@ -29,6 +30,8 @@ const BUTTON_VARIANTS = ["primary", "secondary", "outline", "ghost", "destructiv
 const BUTTON_SIZES = ["sm", "md", "lg"] as const;
 const BADGE_VARIANTS = ["default", "success", "warning", "error", "info"] as const;
 const AVATAR_SIZES = ["sm", "md", "lg"] as const;
+const TEST_COMP_VARIANTS = ["default", "highlight", "muted"] as const;
+const TEST_COMP_SIZES = ["sm", "md", "lg"] as const;
 
 /* ═══════════════════════════════════════════════════
    Section heading — numbered specimen labels
@@ -233,6 +236,33 @@ export default function ShowcasePage() {
 							))}
 						</div>
 					</div>
+				</div>
+			</section>
+
+			<hr className="border-border" />
+
+			{/* ── 07 TestComp ──────────────────────────── */}
+			<section>
+				<SectionHeading
+					number="07"
+					title="TestComp"
+					description="3 variants &times; 3 sizes for inline content blocks."
+				/>
+				<div className="space-y-6">
+					{TEST_COMP_VARIANTS.map((variant) => (
+						<div key={variant}>
+							<p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+								{variant}
+							</p>
+							<div className="flex flex-wrap items-center gap-3">
+								{TEST_COMP_SIZES.map((size) => (
+									<TestComp key={size} variant={variant} size={size}>
+										{variant} / {size}
+									</TestComp>
+								))}
+							</div>
+						</div>
+					))}
 				</div>
 			</section>
 
