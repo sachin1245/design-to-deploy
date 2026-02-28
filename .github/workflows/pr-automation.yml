@@ -1,0 +1,258 @@
+name: PR Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ─── Auto-label by changed file paths ────────────────────────
+  label:
+    name: Auto-label PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply path-based labels
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          sync-labels: true
+
+  # ─── PR size label (XS / S / M / L / XL) ────────────────────
+  size:
+    name: PR size label
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label PR by size
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+
+            // Fetch list of changed files (paginated)
+            let additions = 0;
+            let deletions = 0;
+            let page = 1;
+            while (true) {
+              const { data: files } = await github.rest.pulls.listFiles({
+                owner,
+                repo,
+                pull_number,
+                per_page: 100,
+                page,
+              });
+              if (files.length === 0) break;
+              for (const file of files) {
+                additions += file.additions;
+                deletions += file.deletions;
+              }
+              if (files.length < 100) break;
+              page++;
+            }
+
+            const totalChanges = additions + deletions;
+
+            // Determine size label
+            let sizeLabel;
+            if (totalChanges < 10) {
+              sizeLabel = 'size/XS';
+            } else if (totalChanges < 50) {
+              sizeLabel = 'size/S';
+            } else if (totalChanges < 200) {
+              sizeLabel = 'size/M';
+            } else if (totalChanges < 500) {
+              sizeLabel = 'size/L';
+            } else {
+              sizeLabel = 'size/XL';
+            }
+
+            // Remove any existing size labels
+            const sizeLabels = ['size/XS', 'size/S', 'size/M', 'size/L', 'size/XL'];
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number: pull_number,
+            });
+
+            for (const label of currentLabels) {
+              if (sizeLabels.includes(label.name) && label.name !== sizeLabel) {
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: pull_number,
+                  name: label.name,
+                });
+              }
+            }
+
+            // Add the correct size label (create if missing)
+            try {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: pull_number,
+                labels: [sizeLabel],
+              });
+            } catch (e) {
+              // Label might not exist yet — create it first
+              const colors = {
+                'size/XS': '3CBF00',
+                'size/S':  '5D9801',
+                'size/M':  '7F7203',
+                'size/L':  'A14C05',
+                'size/XL': 'C32607',
+              };
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: sizeLabel,
+                color: colors[sizeLabel],
+                description: `PR changes ${sizeLabel.split('/')[1]} amount of code`,
+              });
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: pull_number,
+                labels: [sizeLabel],
+              });
+            }
+
+            core.info(`PR #${pull_number}: ${additions} additions, ${deletions} deletions, total ${totalChanges} → ${sizeLabel}`);
+
+  # ─── Run tests and comment results on PR ─────────────────────
+  test-results:
+    name: Test results comment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        id: unit
+        continue-on-error: true
+        run: |
+          pnpm test:unit --reporter=json --outputFile=unit-results.json 2>&1 | tee unit-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Run typecheck
+        id: typecheck
+        continue-on-error: true
+        run: |
+          pnpm typecheck 2>&1 | tee typecheck-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Run lint
+        id: lint
+        continue-on-error: true
+        run: |
+          pnpm lint 2>&1 | tee lint-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Comment test results on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+
+            // Parse unit test results
+            let unitSummary = '⚠️ No results file found';
+            let unitPassed = 0;
+            let unitFailed = 0;
+            let unitTotal = 0;
+            try {
+              const raw = fs.readFileSync('unit-results.json', 'utf8');
+              const results = JSON.parse(raw);
+              unitPassed = results.numPassedTests || 0;
+              unitFailed = results.numFailedTests || 0;
+              unitTotal  = results.numTotalTests || 0;
+              const icon = unitFailed > 0 ? '❌' : '✅';
+              unitSummary = `${icon} **${unitPassed}** passed, **${unitFailed}** failed, **${unitTotal}** total`;
+            } catch {
+              // Fallback: try reading the text output
+              try {
+                const txt = fs.readFileSync('unit-output.txt', 'utf8');
+                const passMatch = txt.match(/Tests\s+(\d+)\s+passed/);
+                const failMatch = txt.match(/Tests\s+(\d+)\s+failed/);
+                if (passMatch || failMatch) {
+                  unitPassed = passMatch ? parseInt(passMatch[1]) : 0;
+                  unitFailed = failMatch ? parseInt(failMatch[1]) : 0;
+                  unitTotal = unitPassed + unitFailed;
+                  const icon = unitFailed > 0 ? '❌' : '✅';
+                  unitSummary = `${icon} **${unitPassed}** passed, **${unitFailed}** failed, **${unitTotal}** total`;
+                } else {
+                  unitSummary = '⚠️ Could not parse test output';
+                }
+              } catch {
+                unitSummary = '⚠️ Tests did not produce output';
+              }
+            }
+
+            // Typecheck status
+            const typecheckOk = '${{ steps.typecheck.outcome }}' === 'success';
+            const typecheckIcon = typecheckOk ? '✅' : '❌';
+
+            // Lint status
+            const lintOk = '${{ steps.lint.outcome }}' === 'success';
+            const lintIcon = lintOk ? '✅' : '❌';
+
+            // Build the comment body
+            const body = [
+              '## 🤖 PR Automation — Test Results',
+              '',
+              '| Check | Status |',
+              '|-------|--------|',
+              `| Unit Tests | ${unitSummary} |`,
+              `| TypeCheck | ${typecheckIcon} ${typecheckOk ? 'Passed' : 'Failed'} |`,
+              `| Lint | ${lintIcon} ${lintOk ? 'Passed' : 'Failed'} |`,
+              '',
+              `<sub>Updated for commit ${context.sha.slice(0, 7)}</sub>`,
+            ].join('\n');
+
+            // Find existing bot comment to update (avoid spam)
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: pull_number,
+            });
+
+            const marker = '## 🤖 PR Automation — Test Results';
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated existing comment #${existing.id}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pull_number,
+                body,
+              });
+              core.info('Created new test results comment');
+            }

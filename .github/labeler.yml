@@ -1,0 +1,28 @@
+# Path-based PR labeling config for actions/labeler@v5
+# Docs: https://github.com/actions/labeler
+
+design-system:
+  - changed-files:
+      - any-glob-to-any-file: "src/components/**"
+
+testing:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+          - "src/**/__tests__/**"
+          - "vitest.config.*"
+          - "playwright.config.*"
+
+ci-cd:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+api:
+  - changed-files:
+      - any-glob-to-any-file: "src/app/api/**"
+
+app:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/**"
+          - "!src/app/api/**"
