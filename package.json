@@ -16,6 +16,7 @@
 		"test:e2e": "playwright test --config=playwright.config.ts tests/e2e/",
 		"test:visual": "playwright test --config=playwright.config.ts tests/visual/",
 		"test:integration": "vitest run --config vitest.config.ts src/app/api/",
+		"test:all": "pnpm test:unit && pnpm test:integration && pnpm test:e2e && pnpm test:visual",
 		"analyze": "ANALYZE=true pnpm build"
 	},
 	"dependencies": {
