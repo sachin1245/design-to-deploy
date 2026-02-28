@@ -33,6 +33,67 @@ npm run test:all      # Everything
 - Feature branches: `feature/<issue-number>-<short-description>`
 - Bug fix branches: `fix/<issue-number>-<short-description>`
 
+## Parallel Session Workflow
+Use git worktrees for parallel Claude sessions:
+```bash
+claude -w issue-<number>    # Creates isolated worktree
+```
+Each worktree session must:
+1. Run `pnpm install` first
+2. Stay focused on the assigned issue only
+3. Use a unique dev server port if needed: `PORT=300X pnpm dev`
+4. Run full verification before committing
+5. Create PR with `gh pr create` targeting `main`
+
+Do NOT modify shared config files (package.json, tsconfig.json, next.config.ts)
+without explicit user approval.
+
+## Orchestrated Parallel Execution
+Run multiple issues in parallel blocks using tmux + worktrees:
+
+```bash
+# Preview what will happen
+./scripts/orchestrate.sh --dry-run --block "42,43" --block "44,8,9"
+
+# Run with defaults ($5 budget/worker, manual merge confirmation)
+./scripts/orchestrate.sh --block "42,43" --block "44,8,9"
+
+# Higher budget + auto-wait for merges
+./scripts/orchestrate.sh --block "42,43" --block "44,8,9" --auto-merge-wait --budget 8.00
+
+# Or use the slash command (generates the shell command for you)
+# /orchestrate 42,43 | 44,8,9
+```
+
+**Block format:** Issues within a `--block` run in parallel. Blocks run sequentially — each waits for the previous block's PRs to merge.
+
+**Options:**
+| Flag | Description |
+|------|-------------|
+| `--block "<issues>"` | Comma-separated issue numbers (repeatable) |
+| `--budget <amount>` | Max USD per worker (default: 5.00) |
+| `--auto-merge-wait` | Poll GitHub for merged PRs instead of manual Enter |
+| `--dry-run` | Preview without executing |
+
+**tmux navigation:**
+- `tmux attach -t claude-orchestrator` — attach to session
+- `Ctrl-B n` / `Ctrl-B p` — next/prev window
+- `Ctrl-B 0` — status window
+- `Ctrl-B d` — detach (workers keep running)
+
+**Status/logs:**
+- `.claude/worktrees/status/issue-N.status` — worker state
+- `.claude/worktrees/logs/issue-N.log` — full output
+
+### Shared Config File Registry
+Workers must NOT modify these files without explicit justification:
+- `package.json` / `pnpm-lock.yaml`
+- `tsconfig.json`, `next.config.ts`, `tailwind.config.ts`
+- `vitest.config.ts`, `playwright.config.ts`
+- `biome.json`, `lefthook.yml`
+- `src/app/layout.tsx`
+- `.claude/settings.json`
+
 ## Mandatory Skills
 
 ### frontend-design Skill (REQUIRED)
