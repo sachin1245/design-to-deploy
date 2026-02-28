@@ -139,3 +139,107 @@ Two MCP servers are configured in `.mcp.json` for browser automation and design 
 1. **Figma → Code**: `get_design_context(nodeId, fileKey)` → adapt output to project stack
 2. **Code → Visual**: Use Playwright to screenshot running app at multiple viewports
 3. **Code Connect**: Map components via `add_code_connect_map` (deferred until Figma plan upgrade)
+
+## Battle-Tested Patterns (Learned from 39 PRs)
+
+These patterns emerged from building this project end-to-end and represent
+corrections, optimizations, and best practices confirmed through real usage.
+
+### Biome Linter Gotchas
+- **Bracket notation for env vars**: TypeScript's `noPropertyAccessFromIndexSignature`
+  requires `process.env["CI"]` instead of `process.env.CI`. Biome flags this — add
+  `// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature requires bracket notation`
+  above the line when bracket notation is intentional.
+- **Node protocol imports**: Biome auto-fixes `import path from "path"` to
+  `import path from "node:path"`. Let the pre-commit hook handle this — do not
+  fight it.
+- **Import organization**: Biome sorts and groups imports automatically on format.
+  Do not manually organize imports; run `pnpm format` instead.
+
+### Playwright E2E Test Patterns
+- **Always use `{ exact: true }` with `getByText()`** — text like "Home" appears
+  in navigation, breadcrumbs, footer, and page content. Without exact matching,
+  Playwright's strict mode throws ambiguity errors.
+- **Scope locators to landmarks**: When the same link text appears in multiple
+  areas, chain locators:
+  ```ts
+  page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Home" })
+  ```
+- **Use separate ports for local E2E**: The Playwright config uses port 3100
+  locally (`CI ? 3000 : 3100`) to avoid conflicts with `pnpm dev` on 3000.
+- **Visual regression thresholds**: `threshold: 0.2` and `maxDiffPixels: 100`
+  balance sensitivity against false positives from font rendering differences.
+
+### Component Architecture Lessons
+- **Semantic tokens enable theme swapping for free**: All 36 components use
+  CSS custom properties (`bg-primary`, `text-foreground`, etc.) instead of
+  hardcoded colors. Adding the "Area" design system (PR #80) required zero
+  component modifications — only new token values in `globals.css`.
+- **`forwardRef` + `displayName` on every component**: Enforced from day one.
+  This paid off when composing components (Dialog, Sheet, Popover) and when
+  debugging React DevTools.
+- **CVA for variants, compound pattern for multi-part components**: This split
+  keeps simple components (Button, Badge) lightweight while allowing complex
+  components (Table, Accordion, Stepper) to export multiple parts cleanly.
+
+### Hydration and SSR Pitfalls
+- **`suppressHydrationWarning` on theme scripts**: Inline `<script>` tags that
+  read `localStorage` (for FOUC prevention) cause hydration mismatches because
+  browsers clear `nonce` attributes from the DOM after reading them. Always add
+  `suppressHydrationWarning` to these script elements.
+- **`next-themes` + custom design systems**: The `.dark` class and
+  `data-design-system` attribute are independent axes. Test all 4 combinations
+  (default-light, default-dark, area-light, area-dark).
+
+### Testing Lessons
+- **JSDOM `setTimeout` reliability**: Tests using `waitFor` with tooltip or
+  popover timers may need increased timeouts (e.g., `{ timeout: 3000 }`)
+  because JSDOM's timer simulation is less precise than real browsers.
+- **Test selector priority**: `getByRole` > `getByLabelText` > `getByText` >
+  `getByTestId`. Role-based selectors are more resilient to copy changes and
+  enforce accessibility.
+- **Coverage thresholds (80%)**: Set early (Phase 3) and maintained throughout.
+  The `vitest.config.ts` uses `v8` provider with glob includes so new files
+  are automatically tracked.
+
+### Accessibility Rules (Learned the Hard Way)
+- **Unique `aria-label` on every landmark**: Multiple `<nav>` elements without
+  distinct labels break Lighthouse accessibility scores AND Playwright locator
+  resolution. Always label: `aria-label="Main navigation"`,
+  `aria-label="Footer navigation"`.
+- **Form controls need labels even in showcases**: Lighthouse does not distinguish
+  demo components from production usage. Every `<input>`, `<select>`, toggle,
+  slider, and progress bar needs an associated `<label>` or `aria-label`.
+- **Avoid `text-primary/50` for readable text**: Opacity-based text colors
+  (e.g., `text-primary/50`) often fail WCAG AA 4.5:1 contrast ratio. Use
+  semantic tokens like `text-muted-foreground` instead.
+
+### CI/CD Patterns That Worked
+- **Concurrency groups with `cancel-in-progress`**: Every workflow uses
+  `concurrency: { group: ..., cancel-in-progress: true }` to avoid wasting
+  CI minutes on superseded pushes.
+- **Separate preview and production deploy workflows**: `vercel-preview.yml`
+  runs on PRs (with deployment URL comment), `vercel-production.yml` runs
+  on `main` push only. This prevents accidental production deploys.
+- **Lighthouse CI as a dedicated workflow**: Keeps the main test pipeline fast
+  while still catching performance regressions on every PR.
+
+### Claude Code Configuration Patterns
+- **PostToolUse hooks for auto-formatting**: The Biome format hook
+  (`biome check --write --unsafe "$CLAUDE_FILE_PATH"`) runs after every
+  Write/Edit, eliminating manual formatting steps entirely.
+- **Stop hooks for verification**: Running `pnpm typecheck` and `pnpm lint`
+  on Stop ensures no session ends with broken code.
+- **Shared Config File Registry**: Listing protected files in CLAUDE.md
+  prevents worktree agents from creating merge conflicts on critical configs.
+- **Worktrees for parallel work**: `claude -w issue-<N>` creates isolated
+  environments. Always run `pnpm install` first in a new worktree.
+
+### Design System Token Architecture
+- **Indirection layers for theme swapping**: CSS custom properties like
+  `--display-font` and `--radius-base-*` allow design systems (Clarity vs Area)
+  to override presentation without touching components or Tailwind config.
+- **Avoid extreme radius values**: `--radius-base-xl: 9999px` (pill shape)
+  creates oval-shaped cards and dialogs. Use reasonable values like `1.5rem`.
+- **Motion tokens over hardcoded durations**: `--duration-fast: 150ms`,
+  `--ease-spring`, etc. keep animations consistent and adjustable per theme.
