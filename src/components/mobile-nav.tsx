@@ -94,7 +94,10 @@ export function MobileNav() {
 			{/* Overlay */}
 			{open && (
 				<div className="fixed inset-0 z-40 bg-background/95 backdrop-blur-sm">
-					<nav className="flex h-full flex-col items-center justify-center gap-2">
+					<nav
+						aria-label="Mobile navigation"
+						className="flex h-full flex-col items-center justify-center gap-2"
+					>
 						{navItems.map((item) => {
 							const isActive =
 								item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);

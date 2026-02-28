@@ -54,7 +54,7 @@ test.describe("App Pages", () => {
 			await page.goto("/about");
 			await expect(page.getByText("Tech Stack")).toBeVisible();
 			await expect(page.getByText("Next.js 15")).toBeVisible();
-			await expect(page.getByText("React 19")).toBeVisible();
+			await expect(page.getByText("React 19", { exact: true })).toBeVisible();
 			await expect(page.getByText("TypeScript")).toBeVisible();
 			await expect(page.getByText("Tailwind CSS v4")).toBeVisible();
 		});
@@ -82,7 +82,7 @@ test.describe("App Pages", () => {
 
 		test("displays all stat cards", async ({ page }) => {
 			await page.goto("/dashboard");
-			await expect(page.getByText("Components")).toBeVisible();
+			await expect(page.getByText("Components", { exact: true })).toBeVisible();
 			await expect(page.getByText("Test Coverage")).toBeVisible();
 			await expect(page.getByText("Type Safety")).toBeVisible();
 			await expect(page.getByText("Build Score")).toBeVisible();
@@ -152,14 +152,15 @@ test.describe("App Pages", () => {
 			await expect(menuButton).toBeVisible();
 
 			await menuButton.click();
-			await expect(page.getByRole("navigation")).toBeVisible();
-			await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
-			await expect(page.getByRole("link", { name: "About" })).toBeVisible();
-			await expect(page.getByRole("link", { name: "Dashboard" })).toBeVisible();
-			await expect(page.getByRole("link", { name: "Showcase" })).toBeVisible();
+			const mobileNav = page.getByRole("navigation", { name: "Mobile navigation" });
+			await expect(mobileNav).toBeVisible();
+			await expect(mobileNav.getByRole("link", { name: "Home" })).toBeVisible();
+			await expect(mobileNav.getByRole("link", { name: "About" })).toBeVisible();
+			await expect(mobileNav.getByRole("link", { name: "Dashboard" })).toBeVisible();
+			await expect(mobileNav.getByRole("link", { name: "Showcase" })).toBeVisible();
 
 			await page.getByRole("button", { name: /close menu/i }).click();
-			await expect(page.getByRole("navigation")).toBeHidden();
+			await expect(mobileNav).toBeHidden();
 		});
 
 		test("mobile menu navigates to About", async ({ page }) => {
