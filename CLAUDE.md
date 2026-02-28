@@ -32,3 +32,18 @@ npm run test:all      # Everything
 - `main` = production (protected)
 - Feature branches: `feature/<issue-number>-<short-description>`
 - Bug fix branches: `fix/<issue-number>-<short-description>`
+
+## Mandatory Skills
+
+### frontend-design Skill (REQUIRED)
+**You MUST invoke the `frontend-design` skill (installed as a Claude Code plugin) before writing or modifying any UI component code.** This is non-negotiable.
+
+Use `frontend-design` for:
+- Creating new UI components (Button, Input, Card, Avatar, Dialog, Badge, etc.)
+- Building or modifying page layouts (Home, About, Dashboard)
+- Implementing designs from Figma into code
+- Any visual/styling work involving Tailwind CSS or component variants
+- Component showcase pages
+- Any JSX/TSX that renders visible UI elements
+
+**Workflow**: Always invoke `frontend-design` skill first → get design guidance → then implement the code. Never skip this step.
