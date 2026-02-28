@@ -26,6 +26,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # Directories for status tracking and logs
 STATUS_DIR="$PROJECT_ROOT/.claude/worktrees/status"
 LOG_DIR="$PROJECT_ROOT/.claude/worktrees/logs"
+PROMPT_DIR="$PROJECT_ROOT/.claude/worktrees/prompts"
+WORKER_DIR="$PROJECT_ROOT/.claude/worktrees/workers"
 TMUX_SESSION="claude-orchestrator"
 
 # Defaults
@@ -175,7 +177,7 @@ check_prerequisites() {
 # ── Status tracking ──────────────────────────────────────────────────────────
 
 init_status_dirs() {
-  mkdir -p "$STATUS_DIR" "$LOG_DIR"
+  mkdir -p "$STATUS_DIR" "$LOG_DIR" "$PROMPT_DIR" "$WORKER_DIR"
 }
 
 set_status() {
@@ -197,28 +199,79 @@ get_status() {
 
 build_worker_prompt() {
   local issue="$1"
-  cat <<PROMPT
+  local prompt_file="$PROMPT_DIR/issue-${issue}.txt"
+  local port=$((3100 + issue))
+
+  cat > "$prompt_file" <<PROMPT
 You are working on GitHub issue #${issue} for the design-to-deploy project.
 
 ## Instructions
 
-1. Run \`pnpm install\` first
-2. Read the issue: \`gh issue view ${issue}\`
-3. Create a feature branch: \`feature/${issue}-<short-description>\`
+1. Run pnpm install first
+2. Read the issue: gh issue view ${issue}
+3. Create a feature branch: feature/${issue}-<short-description>
 4. Implement all tasks described in the issue
-5. Run full verification: \`pnpm typecheck && pnpm lint && pnpm build\`
-6. Run tests if available: \`pnpm test:unit\` (skip if script doesn't exist)
+5. Run full verification: pnpm typecheck && pnpm lint && pnpm build
+6. Run tests if available: pnpm test:unit (skip if script does not exist)
 7. Commit with a conventional commit message referencing #${issue}
-8. Push and create PR: \`gh pr create --base main --title "<title>" --body "Closes #${issue}"\`
+8. Push and create PR: gh pr create --base main --title "<title>" --body "Closes #${issue}"
 
 ## Rules
 
 - Stay focused on issue #${issue} only
 - Do NOT modify shared config files (package.json, pnpm-lock.yaml, tsconfig.json, next.config.ts, tailwind.config.ts, vitest.config.ts, playwright.config.ts, biome.json, lefthook.yml, src/app/layout.tsx, .claude/settings.json) unless absolutely required by the issue
-- Use dev server port $((3100 + issue)) if you need to run a dev server
+- Use dev server port ${port} if you need to run a dev server
 - If the issue requires UI work, invoke the frontend-design skill first
 - Write clean, tested code following project conventions
 PROMPT
+
+  echo "$prompt_file"
+}
+
+# ── Worker shell script builder ──────────────────────────────────────────────
+
+build_worker_script() {
+  local issue="$1"
+  local prompt_file="$2"
+  local log_file="$LOG_DIR/issue-${issue}.log"
+  local worktree_name="issue-${issue}"
+  local worker_script="$WORKER_DIR/issue-${issue}.sh"
+
+  cat > "$worker_script" <<WORKEREOF
+#!/usr/bin/env bash
+cd "$PROJECT_ROOT"
+unset CLAUDECODE
+
+echo "Starting worker for issue #${issue}..."
+echo "Prompt file: ${prompt_file}"
+echo "Log file: ${log_file}"
+echo "Worktree: ${worktree_name}"
+echo "Budget: \$${BUDGET}"
+echo "---"
+
+claude -p -w "${worktree_name}" \\
+  --permission-mode bypassPermissions \\
+  --max-budget-usd "${BUDGET}" \\
+  "\$(cat "${prompt_file}")" \\
+  2>&1 | tee "${log_file}"
+
+exit_code=\$?
+echo "\$exit_code" > "${STATUS_DIR}/issue-${issue}.exitcode"
+
+if [ "\$exit_code" -eq 0 ]; then
+  echo "completed" > "${STATUS_DIR}/issue-${issue}.status"
+else
+  echo "failed" > "${STATUS_DIR}/issue-${issue}.status"
+fi
+
+echo ""
+echo "Worker for issue #${issue} finished (exit code: \$exit_code)."
+echo "Press Enter to close this window."
+read
+WORKEREOF
+
+  chmod +x "$worker_script"
+  echo "$worker_script"
 }
 
 # ── tmux management ──────────────────────────────────────────────────────────
@@ -227,9 +280,43 @@ create_tmux_session() {
   # Kill existing session if any
   tmux kill-session -t "$TMUX_SESSION" 2>/dev/null || true
 
-  # Create session with a status window
-  tmux new-session -d -s "$TMUX_SESSION" -n "status" \
-    "watch -n 5 'echo \"=== Orchestrator Status ===\"; echo; for f in $STATUS_DIR/issue-*.status; do issue=\$(basename \"\$f\" .status | sed \"s/issue-//\"); echo \"Issue #\$issue: \$(cat \"\$f\")\"; done 2>/dev/null || echo \"No workers running\"'"
+  # Create a status-monitoring script
+  local status_script="$WORKER_DIR/status-monitor.sh"
+  cat > "$status_script" <<'STATUSEOF'
+#!/usr/bin/env bash
+while true; do
+  clear
+  echo "=== Orchestrator Status ==="
+  echo ""
+  found=false
+  for f in STATUS_DIR_PLACEHOLDER/issue-*.status; do
+    [ -f "$f" ] || continue
+    found=true
+    issue=$(basename "$f" .status | sed 's/issue-//')
+    status=$(cat "$f")
+    case "$status" in
+      completed) symbol="✓" ;;
+      failed)    symbol="✗" ;;
+      running)   symbol="⟳" ;;
+      starting)  symbol="…" ;;
+      *)         symbol="?" ;;
+    esac
+    echo "  Issue #$issue: $symbol $status"
+  done
+  if [ "$found" = false ]; then
+    echo "  No workers running"
+  fi
+  echo ""
+  echo "Updated: $(date '+%H:%M:%S')"
+  echo "Press Ctrl-C to exit status view"
+  sleep 5
+done
+STATUSEOF
+  sed -i '' "s|STATUS_DIR_PLACEHOLDER|${STATUS_DIR}|g" "$status_script"
+  chmod +x "$status_script"
+
+  # Create session with status monitor
+  tmux new-session -d -s "$TMUX_SESSION" -n "status" "bash $status_script"
 
   log_ok "tmux session '$TMUX_SESSION' created"
   log_info "Attach with: tmux attach -t $TMUX_SESSION"
@@ -238,21 +325,24 @@ create_tmux_session() {
 
 spawn_worker() {
   local issue="$1"
-  local prompt
-  prompt=$(build_worker_prompt "$issue")
-  local log_file="$LOG_DIR/issue-${issue}.log"
-  local worktree_name="issue-${issue}"
 
   set_status "$issue" "starting"
 
-  # Create a new tmux window for this worker
-  # CRITICAL: unset CLAUDECODE so claude can run in tmux pane
-  # Use bypassPermissions for fully autonomous execution — workers run unattended in tmux
-  tmux new-window -t "$TMUX_SESSION" -n "issue-${issue}" \
-    "cd $PROJECT_ROOT && unset CLAUDECODE && echo 'Starting worker for issue #${issue}...' && claude -p -w ${worktree_name} --permission-mode bypassPermissions --max-budget-usd ${BUDGET} \"${prompt}\" 2>&1 | tee ${log_file}; echo \$? > ${STATUS_DIR}/issue-${issue}.exitcode; if [ \$? -eq 0 ]; then echo completed > ${STATUS_DIR}/issue-${issue}.status; else echo failed > ${STATUS_DIR}/issue-${issue}.status; fi; echo 'Worker finished. Press Enter to close.'; read"
+  # Build prompt file (avoids quoting issues)
+  local prompt_file
+  prompt_file=$(build_worker_prompt "$issue")
+
+  # Build worker shell script (avoids tmux quoting hell)
+  local worker_script
+  worker_script=$(build_worker_script "$issue" "$prompt_file")
+
+  # Create a new tmux window running the worker script
+  tmux new-window -t "$TMUX_SESSION" -n "issue-${issue}" "bash $worker_script"
 
   set_status "$issue" "running"
   log_info "Spawned worker for issue #${issue} (window: issue-${issue})"
+  log_info "  Prompt: ${prompt_file}"
+  log_info "  Log:    ${LOG_DIR}/issue-${issue}.log"
 }
 
 # ── Block execution ──────────────────────────────────────────────────────────
@@ -345,7 +435,9 @@ run_block() {
     for issue in "${issues[@]}"; do
       issue=$(echo "$issue" | xargs) # trim whitespace
       log_info "[DRY RUN] Would spawn worker for issue #${issue}"
-      log_info "  Command: unset CLAUDECODE && claude -p -w issue-${issue} --permission-mode bypassPermissions --max-budget-usd ${BUDGET} \"<prompt>\""
+      log_info "  Permission mode: bypassPermissions"
+      log_info "  Budget: \$${BUDGET}"
+      log_info "  Prompt: ${PROMPT_DIR}/issue-${issue}.txt"
       log_info "  Log: ${LOG_DIR}/issue-${issue}.log"
       log_info "  Status: ${STATUS_DIR}/issue-${issue}.status"
     done
@@ -399,6 +491,7 @@ main() {
   done
   log_info "Budget per worker: \$${BUDGET}"
   log_info "Auto-merge wait: ${AUTO_MERGE_WAIT}"
+  log_info "Permission mode: bypassPermissions"
   [[ "$DRY_RUN" == "true" ]] && log_warn "DRY RUN MODE — no actions will be taken"
   echo
 
@@ -436,6 +529,7 @@ main() {
     echo
     log_info "Status files: ${STATUS_DIR}/"
     log_info "Log files:    ${LOG_DIR}/"
+    log_info "Prompt files: ${PROMPT_DIR}/"
     log_info "tmux session: tmux attach -t ${TMUX_SESSION}"
     echo
     log_info "Next steps:"
