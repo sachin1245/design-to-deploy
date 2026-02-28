@@ -123,3 +123,45 @@ body {
   display: inline-flex;
   animation: theme-icon-enter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* ═══════════════════════════════════════════════════
+   Dialog Animations
+   Overlay fade + Content scale/fade for open & close
+   ═══════════════════════════════════════════════════ */
+
+@keyframes dialog-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes dialog-overlay-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes dialog-content-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes dialog-content-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+.animate-dialog-overlay-in  { animation: dialog-overlay-in  150ms ease-out; }
+.animate-dialog-overlay-out { animation: dialog-overlay-out  150ms ease-in; }
+.animate-dialog-content-in  { animation: dialog-content-in   200ms cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-dialog-content-out { animation: dialog-content-out   150ms ease-in; }
