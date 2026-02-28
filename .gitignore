@@ -16,6 +16,9 @@
 /playwright-report/
 /blob-report/
 
+# lighthouse ci
+/.lighthouseci/
+
 # next.js
 /.next/
 /out/
