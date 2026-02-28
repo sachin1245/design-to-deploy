@@ -25,9 +25,11 @@ pnpm lint             # Biome lint + format check
 pnpm lint:fix         # Auto-fix lint + format issues
 pnpm format           # Format files with Biome
 pnpm test:unit        # Unit tests
+pnpm test:integration # Integration tests (API routes)
 pnpm test:e2e         # E2E tests
 pnpm test:visual      # Visual regression
-pnpm test:all         # Everything
+pnpm test:coverage    # Unit tests with coverage report
+pnpm test:all         # All suites sequentially
 ```
 
 ## Branch Strategy
