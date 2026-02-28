@@ -30,6 +30,14 @@ PROMPT_DIR="$PROJECT_ROOT/.claude/worktrees/prompts"
 WORKER_DIR="$PROJECT_ROOT/.claude/worktrees/workers"
 TMUX_SESSION="claude-orchestrator"
 
+# Resolve the correct claude binary (tmux may have a different PATH)
+# Prefer ~/.claude/local/claude (latest), fall back to whichever is in PATH
+if [[ -x "$HOME/.claude/local/claude" ]]; then
+  CLAUDE_BIN="$HOME/.claude/local/claude"
+else
+  CLAUDE_BIN="$(which claude)"
+fi
+
 # Defaults
 BUDGET="5.00"
 AUTO_MERGE_WAIT=false
@@ -142,11 +150,13 @@ check_prerequisites() {
   fi
 
   # claude
-  if ! command -v claude &>/dev/null; then
-    log_error "claude CLI not found. Install: https://docs.anthropic.com/en/docs/claude-code"
+  if [[ ! -x "$CLAUDE_BIN" ]]; then
+    log_error "claude CLI not found at $CLAUDE_BIN. Install: https://docs.anthropic.com/en/docs/claude-code"
     exit 1
   else
-    log_ok "claude CLI found"
+    local claude_version
+    claude_version=$("$CLAUDE_BIN" --version 2>&1 | head -1)
+    log_ok "claude CLI: $CLAUDE_BIN ($claude_version)"
   fi
 
   # gh
@@ -243,14 +253,15 @@ cd "$PROJECT_ROOT"
 unset CLAUDECODE
 
 echo "Starting worker for issue #${issue}..."
+echo "Claude binary: ${CLAUDE_BIN}"
 echo "Prompt file: ${prompt_file}"
 echo "Log file: ${log_file}"
 echo "Worktree: ${worktree_name}"
 echo "Budget: \$${BUDGET}"
 echo "---"
 
-claude -p -w "${worktree_name}" \\
-  --permission-mode bypassPermissions \\
+"${CLAUDE_BIN}" -p -w "${worktree_name}" \\
+  --dangerously-skip-permissions \\
   --max-budget-usd "${BUDGET}" \\
   "\$(cat "${prompt_file}")" \\
   2>&1 | tee "${log_file}"
@@ -435,7 +446,8 @@ run_block() {
     for issue in "${issues[@]}"; do
       issue=$(echo "$issue" | xargs) # trim whitespace
       log_info "[DRY RUN] Would spawn worker for issue #${issue}"
-      log_info "  Permission mode: bypassPermissions"
+      log_info "  Claude: ${CLAUDE_BIN}"
+      log_info "  Flags: --dangerously-skip-permissions"
       log_info "  Budget: \$${BUDGET}"
       log_info "  Prompt: ${PROMPT_DIR}/issue-${issue}.txt"
       log_info "  Log: ${LOG_DIR}/issue-${issue}.log"
@@ -491,7 +503,8 @@ main() {
   done
   log_info "Budget per worker: \$${BUDGET}"
   log_info "Auto-merge wait: ${AUTO_MERGE_WAIT}"
-  log_info "Permission mode: bypassPermissions"
+  log_info "Claude binary: ${CLAUDE_BIN}"
+  log_info "Permission mode: --dangerously-skip-permissions"
   [[ "$DRY_RUN" == "true" ]] && log_warn "DRY RUN MODE — no actions will be taken"
   echo
 
