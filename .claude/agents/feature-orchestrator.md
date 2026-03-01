@@ -39,11 +39,17 @@ You can delegate work to these specialized agents defined in `.claude/agents/`:
 | `design-implementer` | opus | Implements UI components from specs or Figma designs |
 | `test-writer` | sonnet | Writes unit tests (Vitest) and visual regression tests (Playwright) |
 | `code-reviewer` | sonnet | Reviews code for quality, accessibility, performance, security |
+| `staff-reviewer` | opus | Pre-implementation plan review — finds problems before code is written |
+| `verify-app` | sonnet | End-to-end verification — static analysis, tests, and live app checks |
+| `build-validator` | sonnet | Build and CI validation — production readiness checks |
 
 **When to delegate vs. do directly:**
+- Delegate to `staff-reviewer` BEFORE implementation to validate the plan (for complex features)
 - Delegate to `design-implementer` when creating new UI components or complex page layouts
 - Delegate to `test-writer` when comprehensive test suites are needed for new components
 - Delegate to `code-reviewer` for structured review with the full checklist
+- Delegate to `verify-app` for thorough end-to-end verification including live app checks
+- Delegate to `build-validator` for production build validation and bundle analysis
 - Do directly for simple file edits, configuration, non-UI code, or barrel export updates
 
 ## Process
