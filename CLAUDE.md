@@ -38,6 +38,10 @@ pnpm test:all         # All suites sequentially
 - Bug fix branches: `fix/<issue-number>-<short-description>`
 - **ALWAYS**: Every task → GitHub issue → feature branch → PR → merge. See `.claude/rules/pr-workflow.md`.
 
+## Task Planning & Execution
+ALWAYS plan before building. See `.claude/rules/task-planning.md` for the full sequence:
+Explore → Plan → Implement → Simplify → Verify → Review → Ship.
+
 ## Parallel Workflows
 Use native Claude Code features for parallel execution.
 See `.claude/rules/parallel-execution.md` for full details (worktrees, agent teams, orchestrator).
