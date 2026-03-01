@@ -82,6 +82,8 @@ You can delegate work to these specialized agents defined in `.claude/agents/`:
 - Always use `forwardRef`, set `displayName`, accept `className`
 - Export types alongside components
 - Add new components to barrel export in `src/components/ui/index.ts`
+- Use motion utilities from `@/lib/motion` and `@/components/motion` for animations
+- Import spring/variant presets — never hardcode animation values
 
 **For non-UI work** — implement directly:
 - API routes, utilities, configuration, scripts
@@ -128,6 +130,7 @@ Utilities:   src/lib/<name>.ts
 - Security: no exposed secrets, input validation on API routes
 - Code quality: conventions followed, no dead code, tests exist
 - Tailwind: semantic tokens only, mobile-first responsive, no conflicting classes
+- Animation: `useReducedMotion()` respected, spring presets from `@/lib/motion`, no layout-thrashing
 
 **Fix any critical issues** identified during review before proceeding.
 

@@ -114,6 +114,15 @@ Complex interactive components (Avatar, Dialog) use Radix UI primitives:
 - `@radix-ui/react-dialog` for Dialog
 - `@radix-ui/react-slot` for polymorphic components
 
+### Framer Motion (Animation)
+- **Package**: `motion` (v12+) — import from `motion/react` (NOT `framer-motion`)
+- **SSR**: All `motion.*` components MUST be in `"use client"` files
+- **Presets**: Spring configs, variant presets, interaction helpers in `src/lib/motion.ts`
+- **Wrapper components**: `MotionReveal`, `MotionStagger`, `MotionItem` in `src/components/motion/`
+- **Accessibility**: ALWAYS call `useReducedMotion()` — wrapper components handle this automatically
+- **Decision guide**: Use CSS for hover/focus/infinite loops; use Framer Motion for viewport reveals, stagger, springs, exit animations
+- See `.claude/rules/animation-patterns.md` for complete patterns
+
 ## Existing Components
 | Component | Type | Variants |
 |-----------|------|----------|

@@ -91,6 +91,34 @@ Playwright runs in strict mode by default — if a locator matches multiple elem
 - Screenshot config: threshold 0.2, maxDiffPixels 100
 - Update baselines: `pnpm test:visual -- --update-snapshots`
 
+## Testing Animated Components
+When testing components that use Framer Motion (`motion/react`):
+
+1. **Mock `motion/react`** to replace `motion.*` with plain HTML elements:
+```tsx
+vi.mock("motion/react", () => ({
+  motion: new Proxy({}, {
+    get: (_target, prop: string) => {
+      const Component = forwardRef((props: Record<string, unknown>, ref: unknown) => {
+        const htmlProps: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(props)) {
+          if (!motionPropKeys.has(key)) htmlProps[key] = value;
+        }
+        return createElement(prop, { ...htmlProps, ref });
+      });
+      Component.displayName = `motion.${prop}`;
+      return Component;
+    },
+  }),
+  useReducedMotion: () => false,
+  AnimatePresence: ({ children }: { children: ReactNode }) => children,
+}));
+```
+
+2. **Test behavior, not animation values**: Verify rendering, props, refs, events, className merging
+3. **Do NOT test**: Animation values (opacity, transform, spring physics) — that's Framer Motion's responsibility
+4. **Visual regression**: Disable animations in Playwright with `animation-duration: 0s !important`
+
 ## Running Tests
 - Unit: `pnpm test:unit`
 - Integration: `pnpm test:integration`

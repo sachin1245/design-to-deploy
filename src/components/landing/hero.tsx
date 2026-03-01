@@ -1,10 +1,22 @@
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { createStaggerContainer, fadeInUp, reducedMotionTransition, springs } from "@/lib/motion";
 
 export function Hero() {
+	const shouldReduce = useReducedMotion();
+
+	const containerVariants = shouldReduce
+		? { hidden: {}, visible: {} }
+		: createStaggerContainer(0.12, 0.1);
+
+	const itemTransition = shouldReduce ? reducedMotionTransition : springs.gentle;
+
 	return (
 		<section className="relative min-h-[90vh] flex items-center overflow-hidden">
-			{/* Floating orb — decorative gradient sphere */}
+			{/* Floating orb — decorative gradient sphere (CSS animation, kept) */}
 			<div
 				className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[500px] w-[500px] animate-landing-orb rounded-full opacity-30 blur-3xl dark:opacity-20"
 				style={{
@@ -14,57 +26,67 @@ export function Hero() {
 				aria-hidden="true"
 			/>
 
-			{/* Pulse ring accent */}
+			{/* Pulse ring accent (CSS animation, kept) */}
 			<div
 				className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 animate-landing-pulse rounded-full border border-primary/20"
 				aria-hidden="true"
 			/>
 
 			<div className="mx-auto w-full max-w-6xl px-6 py-24 sm:px-8">
-				<div className="max-w-3xl">
+				<motion.div
+					className="max-w-3xl"
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true, amount: 0.2 }}
+					variants={containerVariants}
+				>
 					{/* Eyebrow */}
-					<div className="animate-landing-reveal" style={{ animationDelay: "0ms" }}>
+					<motion.div variants={fadeInUp} transition={itemTransition}>
 						<Badge variant="info" className="mb-6">
 							v1.0 — 36 Components
 						</Badge>
-					</div>
+					</motion.div>
 
 					{/* Headline */}
-					<h1
-						className="animate-landing-reveal font-display text-5xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-6xl lg:text-7xl"
-						style={{ animationDelay: "100ms" }}
+					<motion.h1
+						className="font-display text-5xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-6xl lg:text-7xl"
+						variants={fadeInUp}
+						transition={itemTransition}
 					>
 						Build interfaces
 						<br />
 						with <span className="text-primary">clarity</span>,
 						<br />
 						not compromise.
-					</h1>
+					</motion.h1>
 
 					{/* Subtitle */}
-					<p
-						className="animate-landing-reveal mt-6 max-w-xl text-lg text-muted-foreground sm:text-xl"
-						style={{ animationDelay: "200ms" }}
+					<motion.p
+						className="mt-6 max-w-xl text-lg text-muted-foreground sm:text-xl"
+						variants={fadeInUp}
+						transition={itemTransition}
 					>
 						A production-ready React component library built on Tailwind CSS v4. Accessible,
 						themeable, and designed for teams that care about craft.
-					</p>
+					</motion.p>
 
 					{/* CTAs */}
-					<div
-						className="animate-landing-reveal mt-10 flex flex-wrap gap-4"
-						style={{ animationDelay: "300ms" }}
+					<motion.div
+						className="mt-10 flex flex-wrap gap-4"
+						variants={fadeInUp}
+						transition={itemTransition}
 					>
 						<Button size="lg">Get Started</Button>
 						<Button variant="outline" size="lg">
 							View Components
 						</Button>
-					</div>
+					</motion.div>
 
 					{/* Stats row */}
-					<div
-						className="animate-landing-reveal mt-16 flex gap-10 border-t border-border pt-8"
-						style={{ animationDelay: "400ms" }}
+					<motion.div
+						className="mt-16 flex gap-10 border-t border-border pt-8"
+						variants={fadeInUp}
+						transition={itemTransition}
 					>
 						<div>
 							<p className="font-display text-3xl font-bold text-foreground">36</p>
@@ -78,8 +100,8 @@ export function Hero() {
 							<p className="font-display text-3xl font-bold text-foreground">0</p>
 							<p className="text-sm text-muted-foreground">Dependencies</p>
 						</div>
-					</div>
-				</div>
+					</motion.div>
+				</motion.div>
 			</div>
 		</section>
 	);
