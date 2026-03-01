@@ -52,6 +52,11 @@ export const scaleIn: Variants = {
 	visible: { opacity: 1, scale: 1 },
 };
 
+export const scaleInUp: Variants = {
+	hidden: { opacity: 0, scale: 0.95, y: 16 },
+	visible: { opacity: 1, scale: 1, y: 0 },
+};
+
 // ─── Stagger helpers ────────────────────────────────────────────────
 
 /** Container variant that triggers staggered children. */
