@@ -1,6 +1,6 @@
 Prepare the current work for a pull request:
 
-1. Run full verification: typecheck, lint, unit tests, integration tests, build
+1. Run full verification: typecheck, lint, unit tests, integration tests, e2e tests, visual regression (soft-fail), build
 2. If anything fails, fix it
 3. Stage all changes: `git add -A`
 4. Create a descriptive commit message based on the changes
