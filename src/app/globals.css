@@ -337,3 +337,21 @@ body {
 .animate-landing-pulse {
 	animation: landing-pulse-ring 4s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════════════
+   Marquee Animation (Pricing Page)
+   Infinite horizontal scroll for logo strip
+   ═══════════════════════════════════════════════════ */
+
+@keyframes marquee-scroll {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+.animate-marquee {
+	animation: marquee-scroll 30s linear infinite;
+}
