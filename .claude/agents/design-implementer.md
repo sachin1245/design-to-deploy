@@ -203,6 +203,16 @@ Light `:root` / Dark `.dark` tokens:
 `--accent`, `--accent-foreground`, `--destructive`, `--destructive-foreground`,
 `--border`, `--input`, `--ring`
 
+## Animation Integration
+When implementing designs with animations:
+
+1. **Decide CSS vs Framer Motion**: Use CSS for hover/focus transitions, dialog open/close, infinite loops. Use Framer Motion for viewport reveals, stagger sequences, spring physics, exit animations.
+2. **Implementation pattern**: Import presets from `@/lib/motion`, wrap elements with `MotionReveal`/`MotionStagger`/`MotionItem` from `@/components/motion`
+3. **SSR boundary**: All `motion.*` components MUST be in `"use client"` files. The wrapper components handle this.
+4. **Spring presets**: Use `springs.snappy` (micro-interactions), `springs.default` (general), `springs.gentle` (reveals), `springs.bouncy` (emphasis)
+5. **Interaction presets**: Use `hoverLift`, `hoverScale`, `tapShrink` from `@/lib/motion` with spread syntax: `<motion.div {...hoverLift}>`
+6. **Accessibility**: Wrapper components handle `useReducedMotion()` automatically. When using `motion.*` directly, always check and skip animation.
+
 ## Key Rules
 1. Never hardcode color values -- always use design tokens
 2. Never skip `forwardRef` or `displayName`

@@ -1,4 +1,9 @@
+"use client";
+
+import { motion } from "motion/react";
+import { MotionItem, MotionReveal, MotionStagger } from "@/components/motion";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { hoverLift } from "@/lib/motion";
 
 const features = [
 	{
@@ -106,7 +111,7 @@ export function Features() {
 
 			<div className="mx-auto max-w-6xl px-6 sm:px-8">
 				{/* Section header */}
-				<div className="mb-16 max-w-2xl">
+				<MotionReveal direction="up" spring="gentle" className="mb-16 max-w-2xl">
 					<p className="mb-3 font-mono text-sm font-medium uppercase tracking-wider text-primary">
 						Features
 					</p>
@@ -119,22 +124,26 @@ export function Features() {
 						Built for real products, not demos. Each component is battle-tested, fully typed, and
 						ready for production.
 					</p>
-				</div>
+				</MotionReveal>
 
 				{/* Feature cards */}
-				<div className="grid gap-6 sm:grid-cols-2">
+				<MotionStagger stagger={0.1} className="grid gap-6 sm:grid-cols-2">
 					{features.map((feature) => (
-						<Card key={feature.title} className="group transition-shadow hover:shadow-md">
-							<CardHeader>
-								<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
-									{feature.icon}
-								</div>
-								<CardTitle>{feature.title}</CardTitle>
-								<CardDescription>{feature.description}</CardDescription>
-							</CardHeader>
-						</Card>
+						<MotionItem key={feature.title}>
+							<motion.div {...hoverLift}>
+								<Card className="group transition-shadow hover:shadow-md">
+									<CardHeader>
+										<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+											{feature.icon}
+										</div>
+										<CardTitle>{feature.title}</CardTitle>
+										<CardDescription>{feature.description}</CardDescription>
+									</CardHeader>
+								</Card>
+							</motion.div>
+						</MotionItem>
 					))}
-				</div>
+				</MotionStagger>
 			</div>
 		</section>
 	);

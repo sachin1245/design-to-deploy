@@ -154,9 +154,46 @@ Before declaring tests complete, verify:
 - [ ] Visual tests cover both light and dark themes
 - [ ] All tests pass when run
 
+## Testing Animated Components
+When testing components that use Framer Motion (`motion/react`):
+
+1. **Mock `motion/react`** in the test file to replace `motion.*` with plain HTML:
+```tsx
+import { createElement, forwardRef } from "react";
+
+const motionPropKeys = new Set([
+  "initial", "animate", "exit", "variants", "transition",
+  "whileHover", "whileTap", "whileFocus", "whileDrag", "whileInView",
+  "viewport", "layout", "layoutId", "onAnimationStart", "onAnimationComplete",
+]);
+
+vi.mock("motion/react", () => ({
+  motion: new Proxy({}, {
+    get: (_target, prop: string) => {
+      const Comp = forwardRef((props: Record<string, unknown>, ref: unknown) => {
+        const htmlProps: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(props)) {
+          if (!motionPropKeys.has(key)) htmlProps[key] = value;
+        }
+        return createElement(prop, { ...htmlProps, ref });
+      });
+      Comp.displayName = `motion.${prop}`;
+      return Comp;
+    },
+  }),
+  useReducedMotion: () => false,
+  AnimatePresence: ({ children }: { children: unknown }) => children,
+}));
+```
+
+2. **What to test**: Rendering, props, refs, events, className merging
+3. **What NOT to test**: Animation values (opacity, transform, spring physics)
+4. See `src/components/motion/__tests__/motion.test.tsx` for the reference implementation
+
 ## Reference files
 Use these existing test files as reference for patterns and style:
 - `src/components/ui/__tests__/button.test.tsx` — comprehensive unit test example
 - `src/components/ui/__tests__/input.test.tsx` — form element with label/error states
 - `src/components/ui/__tests__/badge.test.tsx` — simple variant testing
+- `src/components/motion/__tests__/motion.test.tsx` — animated component testing
 - `tests/visual/components.spec.ts` — visual regression test patterns

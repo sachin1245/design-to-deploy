@@ -138,6 +138,15 @@ export const duration = {
 
 export type DurationScale = keyof typeof duration;
 
+/** Duration values in seconds — for use with Framer Motion transitions. */
+export const durationSeconds = {
+	instant: 0.05,
+	fast: 0.15,
+	normal: 0.25,
+	slow: 0.4,
+	slower: 0.6,
+} as const satisfies Record<DurationScale, number>;
+
 export const easing = {
 	default: "cubic-bezier(0.2, 0, 0, 1)",
 	spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -145,3 +154,26 @@ export const easing = {
 } as const;
 
 export type EasingCurve = keyof typeof easing;
+
+// ─── Spring Presets (Framer Motion) ─────────────────────────────────
+
+export type SpringPreset = {
+	type: "spring";
+	stiffness: number;
+	damping: number;
+	mass?: number;
+};
+
+/** Spring presets for Framer Motion — tuned to complement design tokens. */
+export const springPresets = {
+	/** Snappy — fast, crisp interactions (buttons, toggles) */
+	snappy: { type: "spring" as const, stiffness: 400, damping: 30 },
+	/** Default — balanced, natural motion (general purpose) */
+	default: { type: "spring" as const, stiffness: 200, damping: 24 },
+	/** Gentle — smooth reveals (viewport entrance, fade-ins) */
+	gentle: { type: "spring" as const, stiffness: 80, damping: 14 },
+	/** Bouncy — playful, elastic feel (hero elements, emphasis) */
+	bouncy: { type: "spring" as const, stiffness: 300, damping: 12 },
+} as const satisfies Record<string, SpringPreset>;
+
+export type SpringPresetName = keyof typeof springPresets;

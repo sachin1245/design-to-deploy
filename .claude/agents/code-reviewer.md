@@ -49,6 +49,14 @@ For each file, check:
 - [ ] No inline function definitions in JSX that cause unnecessary re-renders
 - [ ] Avoid importing entire libraries when only specific exports are needed
 
+### Animation (Framer Motion)
+- [ ] `motion.*` components only used in `"use client"` files
+- [ ] `useReducedMotion()` checked (or using wrapper components that handle it)
+- [ ] Spring presets imported from `@/lib/motion` (not hardcoded values)
+- [ ] No layout-thrashing animations (animating width/height — use transform instead)
+- [ ] `AnimatePresence` used with `key` prop for exit animations
+- [ ] `aria-hidden="true"` on purely decorative animated elements
+
 ### Security
 - [ ] No `dangerouslySetInnerHTML` without sanitization
 - [ ] No secrets or API keys in client code

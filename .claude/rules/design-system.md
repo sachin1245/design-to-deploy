@@ -59,9 +59,21 @@ Part.displayName = "Part";
 - Use `font-display` for headings and hero text
 
 ### Motion
+
+**CSS Tokens** (for simple transitions):
 - Durations: `--duration-instant` (50ms), `--duration-fast` (150ms), `--duration-normal` (250ms), `--duration-slow` (400ms), `--duration-slower` (600ms)
 - Easing: `--ease-default`, `--ease-spring`, `--ease-out`
-- Use CSS transitions, not JS animation libraries
+- Use CSS transitions for: hover, focus, theme toggle, dialog open/close, infinite loops
+
+**Framer Motion** (for complex animations):
+- Package: `motion` — import from `motion/react`
+- Spring presets: `snappy` (400/30), `default` (200/24), `gentle` (80/14), `bouncy` (300/12)
+- Wrapper components: `MotionReveal`, `MotionStagger`, `MotionItem` in `src/components/motion/`
+- Interaction presets: `hoverLift`, `hoverScale`, `tapShrink` in `src/lib/motion.ts`
+- Use for: viewport reveals, stagger sequences, spring physics, exit animations, SVG path drawing
+- All motion components MUST be in `"use client"` files
+- ALWAYS respect `useReducedMotion()` — wrapper components handle this automatically
+- See `.claude/rules/animation-patterns.md` for full decision matrix and examples
 
 ### Spacing & Radius
 - Spacing: Tailwind default scale (0–20)

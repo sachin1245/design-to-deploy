@@ -60,7 +60,10 @@ If the changes involve UI:
 3. Take screenshots at key viewpoints (1280px, 768px, 375px)
 4. Check browser console for errors or warnings
 5. Verify interactive elements work (click, type, hover)
-6. Close browser when done
+6. Verify animations play correctly on scroll (viewport reveals, staggers)
+7. Emulate `prefers-reduced-motion: reduce` and confirm animations are suppressed
+8. Confirm smooth performance at 375px mobile viewport
+9. Close browser when done
 
 ### 5. Edge Cases
 - Test with invalid inputs where applicable

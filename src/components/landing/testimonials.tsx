@@ -1,3 +1,6 @@
+"use client";
+
+import { MotionItem, MotionReveal, MotionStagger } from "@/components/motion";
 import { Avatar } from "@/components/ui/avatar";
 
 const testimonials = [
@@ -29,7 +32,7 @@ export function Testimonials() {
 		<section className="py-24 sm:py-32">
 			<div className="mx-auto max-w-6xl px-6 sm:px-8">
 				{/* Section header */}
-				<div className="mb-16 max-w-2xl">
+				<MotionReveal direction="up" spring="gentle" className="mb-16 max-w-2xl">
 					<p className="mb-3 font-mono text-sm font-medium uppercase tracking-wider text-primary">
 						Testimonials
 					</p>
@@ -38,34 +41,36 @@ export function Testimonials() {
 						<br />
 						who ship.
 					</h2>
-				</div>
+				</MotionReveal>
 
 				{/* Testimonial grid */}
-				<div className="grid gap-8 sm:grid-cols-3">
+				<MotionStagger stagger={0.12} className="grid gap-8 sm:grid-cols-3">
 					{testimonials.map((t) => (
-						<figure key={t.name} className="relative">
-							{/* Oversized quotation mark */}
-							<span
-								className="pointer-events-none absolute -top-4 -left-2 select-none font-display text-7xl leading-none text-primary/10"
-								aria-hidden="true"
-							>
-								&ldquo;
-							</span>
+						<MotionItem key={t.name}>
+							<figure className="relative">
+								{/* Oversized quotation mark */}
+								<span
+									className="pointer-events-none absolute -top-4 -left-2 select-none font-display text-7xl leading-none text-primary/10"
+									aria-hidden="true"
+								>
+									&ldquo;
+								</span>
 
-							<blockquote className="relative text-base leading-relaxed text-foreground">
-								{t.quote}
-							</blockquote>
+								<blockquote className="relative text-base leading-relaxed text-foreground">
+									{t.quote}
+								</blockquote>
 
-							<figcaption className="mt-6 flex items-center gap-3">
-								<Avatar fallback={t.initials} alt={t.name} size="sm" />
-								<div>
-									<p className="text-sm font-medium text-foreground">{t.name}</p>
-									<p className="text-sm text-muted-foreground">{t.role}</p>
-								</div>
-							</figcaption>
-						</figure>
+								<figcaption className="mt-6 flex items-center gap-3">
+									<Avatar fallback={t.initials} alt={t.name} size="sm" />
+									<div>
+										<p className="text-sm font-medium text-foreground">{t.name}</p>
+										<p className="text-sm text-muted-foreground">{t.role}</p>
+									</div>
+								</figcaption>
+							</figure>
+						</MotionItem>
 					))}
-				</div>
+				</MotionStagger>
 			</div>
 		</section>
 	);
