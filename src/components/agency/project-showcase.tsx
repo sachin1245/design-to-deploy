@@ -61,7 +61,7 @@ export function ProjectShowcase({ className }: ProjectShowcaseProps) {
 	}, []);
 
 	const { scrollYProgress } = useScroll({
-		target: outerRef,
+		...(isDesktop ? { target: outerRef } : {}),
 		offset: ["start start", "end end"],
 	});
 
