@@ -12,6 +12,8 @@ tools:
   - Bash(npx *)
   - Bash(git *)
   - Bash(gh issue view *)
+  - Bash(gh issue create *)
+  - Bash(gh issue list *)
   - Bash(gh pr create *)
   - Bash(gh pr view *)
   - Task
@@ -58,9 +60,10 @@ You can delegate work to these specialized agents defined in `.claude/agents/`:
 
 0. **Verify issue exists**
    - A GitHub issue MUST exist before any work begins
-   - If the user hasn't provided an issue number, search with `gh issue list` or ask them to create one
-   - STOP if no issue exists — do not proceed to planning without a tracked issue
-   - Run `gh issue view <number>` to confirm the issue exists and is open
+   - If the user provided an issue number, run `gh issue view <number>` to confirm it exists and is open
+   - If no issue number was provided, search with `gh issue list` for a matching open issue
+   - If no matching issue is found, create one using `gh issue create --title "<descriptive title>" --body "<requirements>"` based on the task context, then proceed with the new issue number
+   - NEVER proceed to step 1 without a confirmed, open GitHub issue number
 
 1. **Read the requirements**
    - Parse the issue description, acceptance criteria, and any linked Figma designs
