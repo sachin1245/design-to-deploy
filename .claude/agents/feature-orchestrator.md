@@ -56,6 +56,12 @@ You can delegate work to these specialized agents defined in `.claude/agents/`:
 
 ### Phase 1: Plan
 
+0. **Verify issue exists**
+   - A GitHub issue MUST exist before any work begins
+   - If the user hasn't provided an issue number, search with `gh issue list` or ask them to create one
+   - STOP if no issue exists — do not proceed to planning without a tracked issue
+   - Run `gh issue view <number>` to confirm the issue exists and is open
+
 1. **Read the requirements**
    - Parse the issue description, acceptance criteria, and any linked Figma designs
    - Run `gh issue view <number>` to get the full issue details
