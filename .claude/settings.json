@@ -86,6 +86,11 @@
 						"command": "echo '--- TypeCheck ---' && pnpm typecheck 2>&1 | tail -20 && echo '--- Lint ---' && pnpm lint 2>&1 | tail -20",
 						"timeout": 120,
 						"statusMessage": "Running verification (typecheck + lint)..."
+					},
+					{
+						"type": "command",
+						"command": "echo 'If corrections were made this session, offer to capture lessons with /learn'",
+						"timeout": 5
 					}
 				]
 			}
