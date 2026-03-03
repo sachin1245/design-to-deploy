@@ -27,6 +27,18 @@ For each issue number, run `gh issue view <number> --json state,title` to confir
 
 If any issue is invalid or closed, report the error and stop.
 
+### 2.5 Check Path Overlap
+
+Before spawning agents, analyze issue titles and bodies for potential file overlap:
+
+1. For each pair of issues, check if they reference the same files or directories
+2. Use `gh issue view <NUMBER> --json body` and scan for file paths (patterns like `src/`, `.claude/`, `.github/`)
+3. If two issues reference overlapping paths, emit a warning:
+
+> **Warning — Path overlap detected**: Issues #X and #Y both reference `src/components/ui/`. Consider running them sequentially to avoid merge conflicts.
+
+The warning is advisory — the user can proceed anyway, but should be aware of potential conflicts.
+
 ### 3. Spawn Agents (Per Block)
 For each block of issues, spawn all agents in a **single response** (this is critical for true parallelism).
 Each agent gets this prompt (with issue number substituted):
@@ -66,10 +78,33 @@ After spawning all agents in a block, wait for all background agents to complete
 You will be automatically notified when each finishes — do NOT poll or sleep.
 
 ### 5. Report Results
-After all agents in a block complete, summarize:
-- Which issues succeeded (with PR URLs)
-- Which issues failed (with error details)
-- Project board status
+
+After all agents in a block complete, present results in a structured table:
+
+| Issue | Title | Status | PR | Branch | Files Changed |
+|-------|-------|--------|------|--------|---------------|
+| #19 | Add feature X | ✅ Success | #45 | feature/19-add-x | 3 |
+| #20 | Fix bug Y | ❌ Failed | — | fix/20-fix-y | — |
+| #21 | Update docs | ✅ Success | #46 | feature/21-update-docs | 2 |
+
+For each completed agent, extract:
+- **Status**: ✅ Success (PR created) or ❌ Failed (error occurred)
+- **PR**: The PR number/URL if created, "—" if failed
+- **Branch**: The branch name used
+- **Files Changed**: Count of files modified (from `git diff --stat`)
+
+### Error Details
+
+When an agent fails, include the last 20 lines of its output to help diagnose the issue:
+
+<details>
+<summary>❌ Issue #20 — Error details</summary>
+
+[Last 20 lines of agent output from the output file]
+
+</details>
+
+Read the agent's output file (provided in the agent completion notification) and extract the final 20 lines for the error excerpt.
 
 ### 6. Next Block (if applicable)
 If there are more blocks (`|`-separated), proceed to spawn the next block's agents.
