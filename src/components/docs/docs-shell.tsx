@@ -64,9 +64,9 @@ export function DocsShell({ children }: DocsShellProps) {
 			<DocsProgress />
 			<div className="mx-auto grid max-w-6xl gap-8 px-6 py-10 lg:grid-cols-[220px_1fr]">
 				{/* Sidebar — sticky, hidden on mobile */}
-				<aside className="hidden lg:block" aria-label="Documentation navigation">
+				<aside className="hidden lg:block">
 					<div className="sticky top-20">
-						<SidebarNav sections={sidebarSections} />
+						<SidebarNav sections={sidebarSections} aria-label="Documentation navigation" />
 					</div>
 				</aside>
 
