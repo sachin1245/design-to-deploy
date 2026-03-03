@@ -1,7 +1,7 @@
 # design-to-deploy
 
 ## Tech Stack
-- Next.js 15 (App Router, Server Components)
+- Next.js 16 (App Router, Server Components)
 - React 19
 - TypeScript (strict mode)
 - Tailwind CSS v4
