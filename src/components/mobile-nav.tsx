@@ -10,6 +10,7 @@ const navItems = [
 	{ label: "About", href: "/about" },
 	{ label: "Dashboard", href: "/dashboard" },
 	{ label: "Showcase", href: "/showcase" },
+	{ label: "Docs", href: "/docs" },
 ];
 
 function MenuIcon(props: React.SVGProps<SVGSVGElement>) {

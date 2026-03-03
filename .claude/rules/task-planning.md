@@ -58,5 +58,6 @@ Not every step is needed for every task — scale to complexity.
   - **Frontend/Visual**: Playwright MCP screenshots at multiple viewports
   - **E2E**: `pnpm test:e2e`
   - **Production readiness**: `build-validator` agent
-- Run the full verification pipeline before declaring done.
+- NEVER declare "done" with only typecheck + lint + build. The MINIMUM verification for any frontend work is: `pnpm typecheck && pnpm lint && pnpm test:unit && pnpm build`. For pages/routes, ALSO run `pnpm test:e2e`. Cherry-picking 3 of 5 checks is not "verification."
+- If the plan specifies writing tests (e.g., E2E, visual), those tests are deliverables — not optional extras to skip.
 - Hooks handle automatic quality gates — don't fight them, lean into them.

@@ -14,3 +14,6 @@ ALWAYS follow this workflow for every task that changes code or configuration:
 6. **Never push directly to `main`** — all changes go through PRs
 
 This applies to ALL work: features, bug fixes, documentation, configuration changes, and rule file updates.
+
+## No Exceptions — Even With Pre-Approved Plans
+NEVER skip issue creation or branch workflow just because the user provides a complete implementation plan. A pre-approved plan means planning is done — it does NOT bypass issue → branch → implement → verify → PR. The workflow is about traceability and review, not just planning.
