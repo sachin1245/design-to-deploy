@@ -119,15 +119,19 @@ Utilities:   src/lib/<name>.ts
      disabled state, ref forwarding, className merging, accessibility attributes
    - Run: `pnpm test:unit`
 
-2. **E2E tests** (required for page-level changes):
+2. **E2E tests** (MANDATORY for page-level changes):
    - File: `tests/e2e/<feature>.spec.ts`
    - Framework: Playwright
+   - **MANDATORY**: When creating or modifying pages (`src/app/**/page.tsx`), you MUST create or update E2E tests in `tests/e2e/`. Verify the test file exists before proceeding to Phase 4.
    - Run: `pnpm test:e2e`
 
-3. **Visual regression tests** (recommended for new UI components):
+3. **Visual regression tests** (MANDATORY for new UI components):
    - File: `tests/visual/` (add to existing `components.spec.ts` or create new file)
    - Framework: Playwright screenshot tests
+   - **MANDATORY**: When creating new UI components in `src/components/ui/`, you MUST add visual regression tests in `tests/visual/components.spec.ts` (light + dark theme). Verify the test exists before proceeding to Phase 4.
    - Run: `pnpm test:visual`
+
+**Gate check before Phase 4**: Verify (1) unit tests exist and pass for all new/modified components, (2) e2e tests exist for any new/modified pages, (3) visual tests exist for any new components. Do NOT proceed to Phase 4 until all three are confirmed.
 
 ### Phase 4: Review
 
@@ -145,12 +149,15 @@ Utilities:   src/lib/<name>.ts
 
 ### Phase 5: Verify
 
-Run the full verification suite. All commands must pass:
+Run the full verification suite. All commands must pass (visual is soft-fail — report but don't block):
 
 ```bash
 pnpm typecheck        # TypeScript strict check
 pnpm lint             # Biome lint + format check (use pnpm lint:fix if fails)
 pnpm test:unit        # Unit tests
+pnpm test:integration # Integration tests
+pnpm test:e2e         # E2E tests
+pnpm test:visual      # Visual regression (report but don't block)
 pnpm build            # Production build
 ```
 
