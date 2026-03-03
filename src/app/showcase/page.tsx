@@ -855,11 +855,19 @@ export default function ShowcasePage() {
 				<SectionHeading
 					number="31"
 					title="Date Picker"
-					description="Styled date input with label and error support."
+					description="Animated calendar with spring physics, month slide transitions, and full keyboard navigation."
 				/>
-				<div className="grid max-w-2xl gap-6 sm:grid-cols-2">
+				<div className="grid max-w-2xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					<DatePicker label="Start date" />
 					<DatePicker label="End date" error="End date must be after start date" />
+					<DatePicker label="With default" defaultValue={new Date(2026, 2, 15)} />
+					<DatePicker
+						label="Min/Max constrained"
+						min={new Date(2026, 0, 1)}
+						max={new Date(2026, 11, 31)}
+					/>
+					<DatePicker disabled label="Disabled" />
+					<DatePicker placeholder="Custom placeholder…" />
 				</div>
 			</section>
 
