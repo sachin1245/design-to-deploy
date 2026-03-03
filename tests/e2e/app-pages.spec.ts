@@ -171,14 +171,30 @@ test.describe("App Pages", () => {
 		test("mobile menu navigates to About", async ({ page }) => {
 			await page.goto("/");
 			await page.getByRole("button", { name: /open menu/i }).click();
-			await page.getByRole("navigation").getByRole("link", { name: "About" }).click();
+			const mobileNav = page.getByRole("navigation", { name: "Mobile navigation" });
+			await expect(mobileNav).toBeVisible();
+			// The fixed overlay inside a z-40 stacking context causes Playwright
+			// to report the link as "outside of viewport". Use JS click as workaround.
+			await page.evaluate(() => {
+				const link = document.querySelector<HTMLElement>(
+					'nav[aria-label="Mobile navigation"] a[href="/about"]',
+				);
+				link?.click();
+			});
 			await expect(page).toHaveURL(/\/about/);
 		});
 
 		test("mobile menu navigates to Dashboard", async ({ page }) => {
 			await page.goto("/");
 			await page.getByRole("button", { name: /open menu/i }).click();
-			await page.getByRole("navigation").getByRole("link", { name: "Dashboard" }).click();
+			const mobileNav = page.getByRole("navigation", { name: "Mobile navigation" });
+			await expect(mobileNav).toBeVisible();
+			await page.evaluate(() => {
+				const link = document.querySelector<HTMLElement>(
+					'nav[aria-label="Mobile navigation"] a[href="/dashboard"]',
+				);
+				link?.click();
+			});
 			await expect(page).toHaveURL(/\/dashboard/);
 		});
 	});

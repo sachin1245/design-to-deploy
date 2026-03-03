@@ -19,6 +19,7 @@ describe("NavLinks", () => {
 		expect(screen.getByRole("link", { name: "About" })).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: "Showcase" })).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "Docs" })).toBeInTheDocument();
 	});
 
 	it("renders links with correct hrefs", () => {
@@ -27,6 +28,7 @@ describe("NavLinks", () => {
 		expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/about");
 		expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute("href", "/dashboard");
 		expect(screen.getByRole("link", { name: "Showcase" })).toHaveAttribute("href", "/showcase");
+		expect(screen.getByRole("link", { name: "Docs" })).toHaveAttribute("href", "/docs");
 	});
 
 	it("marks Home as active when on root path", () => {
@@ -60,7 +62,7 @@ describe("NavLinks", () => {
 		const list = screen.getByRole("list");
 		expect(list).toBeInTheDocument();
 		const items = screen.getAllByRole("listitem");
-		expect(items).toHaveLength(4);
+		expect(items).toHaveLength(5);
 	});
 
 	it("does not mark Home as active on other routes", () => {
