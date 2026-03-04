@@ -6,7 +6,7 @@ A reference project demonstrating how to build a production-ready Next.js applic
 
 | Category | Technology | Version |
 |----------|-----------|---------|
-| Framework | [Next.js](https://nextjs.org) (App Router, Server Components) | 15 |
+| Framework | [Next.js](https://nextjs.org) (App Router, Server Components) | 16 |
 | UI Library | [React](https://react.dev) | 19 |
 | Language | [TypeScript](https://www.typescriptlang.org) (strict mode) | 5 |
 | Styling | [Tailwind CSS](https://tailwindcss.com) (CSS-first config) | 4 |
@@ -68,24 +68,29 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 ```
 design-to-deploy/
 ├── .claude/                        # Claude Code configuration
-│   ├── agents/                     # Agent definitions (5 agents)
+│   ├── agents/                     # Agent definitions (8 agents)
+│   │   ├── staff-reviewer.md       # Pre-implementation plan review agent
 │   │   ├── code-reviewer.md        # Code review checklist agent
 │   │   ├── test-writer.md          # Unit + visual test writer agent
 │   │   ├── design-implementer.md   # Figma-to-code implementation agent
 │   │   ├── feature-orchestrator.md # Full feature lifecycle coordinator
-│   │   └── agent-team-template.md  # Parallel team coordination template
-│   ├── commands/                   # Slash commands (6 commands)
+│   │   ├── agent-team-template.md  # Parallel team coordination template
+│   │   ├── verify-app.md           # End-to-end verification agent
+│   │   └── build-validator.md      # Production build validation agent
+│   ├── commands/                   # Slash commands (7 commands)
 │   │   ├── verify.md               # /verify — full verification pipeline
 │   │   ├── new-component.md        # /new-component — scaffold a UI component
 │   │   ├── pr-ready.md             # /pr-ready — prepare and open a PR
 │   │   ├── work-on-issue.md        # /work-on-issue — end-to-end issue workflow
 │   │   ├── orchestrate.md          # /orchestrate — parallel subagent execution
-│   │   └── cleanup-worktrees.md    # /cleanup-worktrees — remove merged worktrees
+│   │   ├── cleanup-worktrees.md    # /cleanup-worktrees — remove merged worktrees
+│   │   └── learn.md                # /learn — capture corrections as durable rules
 │   ├── rules/
 │   │   └── design-system.md        # Design system conventions and tokens
-│   ├── skills/                     # Contextual skills (2 skills)
+│   ├── skills/                     # Contextual skills (3 skills)
 │   │   ├── frontend-stack/SKILL.md # Next.js + React + Tailwind patterns
-│   │   └── testing/SKILL.md        # Vitest + Playwright test patterns
+│   │   ├── testing/SKILL.md        # Vitest + Playwright test patterns
+│   │   └── gemini/SKILL.md         # Gemini CLI MCP integration patterns
 │   └── settings.json               # Permissions and hooks
 ├── .github/                        # GitHub configuration
 │   ├── workflows/                  # CI/CD workflows
@@ -195,8 +200,9 @@ Skills provide contextual knowledge that Claude Code activates based on file pat
 
 | Skill | Activates On | Purpose |
 |-------|-------------|---------|
-| `frontend-stack` | `src/**/*.tsx`, `src/**/*.ts`, `globals.css` | Next.js 15, React 19, Tailwind v4 patterns, component conventions, CVA usage |
+| `frontend-stack` | `src/**/*.tsx`, `src/**/*.ts`, `globals.css` | Next.js 16, React 19, Tailwind v4 patterns, component conventions, CVA usage |
 | `testing` | `__tests__/**`, `tests/**`, `vitest.config.*`, `playwright.config.*` | Vitest + Playwright test patterns, selector best practices, visual regression setup |
+| `gemini` | Manual invocation (before `mcp__gemini-cli__*` calls) | Gemini CLI MCP integration: model config, auth, and tool prefixes |
 
 ### Agents
 
@@ -204,11 +210,14 @@ Agents are specialized AI personas for specific development tasks:
 
 | Agent | Model | Purpose |
 |-------|-------|---------|
+| **Staff Reviewer** | Opus | Pre-implementation plan review -- validates plans and finds problems before code is written |
 | **Code Reviewer** | Sonnet | Structured code review: TypeScript, a11y, performance, security, Tailwind, testing |
 | **Test Writer** | Sonnet | Writes unit tests (Vitest) and visual regression tests (Playwright) for components |
 | **Design Implementer** | Opus | Implements UI components from Figma designs or specs using the design system |
 | **Feature Orchestrator** | Opus | Coordinates full feature lifecycle: plan, implement, test, review, verify, PR |
 | **Agent Team Template** | Opus | Defines UX + Implementation + QA team roles for parallel coordinated work |
+| **Verify App** | Sonnet | End-to-end verification: static analysis, tests, and live app checks |
+| **Build Validator** | Sonnet | Build and CI specialist -- validates production readiness and bundle size |
 
 ### Slash Commands
 
@@ -222,6 +231,7 @@ Commands are reusable workflows invoked with `/command-name` in Claude Code:
 | `/work-on-issue` | `/work-on-issue 42` | End-to-end issue workflow: read issue, create branch, implement, verify, PR |
 | `/orchestrate` | `/orchestrate 19,20,21` | Spawns parallel subagents in isolated worktrees, one per issue |
 | `/cleanup-worktrees` | `/cleanup-worktrees` | Lists and removes worktrees whose branches have been merged to main |
+| `/learn` | `/learn` | Captures a correction or lesson as a durable rule in project memory |
 
 ### Hooks
 
@@ -235,10 +245,11 @@ Hooks run automatically at specific points in the Claude Code workflow:
 
 ### MCP Servers
 
-Two MCP (Model Context Protocol) servers are configured in `.mcp.json`:
+Three MCP (Model Context Protocol) servers are configured in `.mcp.json`:
 
 - **Playwright MCP** (local): Browser automation for visual verification, E2E testing, and responsive design checks. No rate limits.
 - **Figma MCP** (remote): Design integration for extracting design context, generating design system rules, and managing Code Connect mappings. Free tier: 6 calls/month.
+- **Gemini CLI MCP** (local): Broad codebase analysis, second opinions, accessibility audits, and research via Google Gemini. No rate limits.
 
 ### Parallel Development
 
