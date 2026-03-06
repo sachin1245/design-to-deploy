@@ -85,7 +85,7 @@ export const OVERVIEW = {
 	title: "Claude Code Orchestration",
 	subtitle: "Interactive developer guide for design-to-deploy",
 	description:
-		"This project is a Next.js 15 showcase that demonstrates how to orchestrate Claude Code for production development. It combines 7 specialized agents, 7 slash commands, 3 skills, automated hooks, and MCP server integrations into a cohesive workflow.",
+		"This project is a Next.js 16 showcase that demonstrates how to orchestrate Claude Code for production development. It combines 7 specialized agents, 7 slash commands, 3 skills, automated hooks, and MCP server integrations into a cohesive workflow.",
 	quickStart: [
 		"Plan before you build — use Plan mode for non-trivial tasks",
 		"Agents are specialized — use the right one for the job",
@@ -263,7 +263,7 @@ export const SKILLS: SkillInfo[] = [
 		name: "frontend-stack",
 		trigger: "Loaded contextually for *.tsx files",
 		description:
-			"Injects Next.js 15, React 19, and Tailwind v4 patterns. Covers App Router conventions, Server Component rules, and project-specific component patterns.",
+			"Injects Next.js 16, React 19, and Tailwind v4 patterns. Covers App Router conventions, Server Component rules, and project-specific component patterns.",
 		glob: "src/**/*.tsx",
 	},
 	{

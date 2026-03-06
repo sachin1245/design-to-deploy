@@ -1,5 +1,5 @@
 ---
-description: Next.js 15 + React 19 + Tailwind v4 patterns for this project
+description: Next.js 16 + React 19 + Tailwind v4 patterns for this project
 globs:
   - "src/**/*.tsx"
   - "src/**/*.ts"
@@ -9,7 +9,7 @@ globs:
 
 # Frontend Stack Patterns
 
-## Next.js 15 App Router
+## Next.js 16 App Router
 - Default to Server Components (no "use client" unless needed)
 - Use "use client" only for: event handlers, useState/useEffect, browser APIs
 - Layouts in `layout.tsx` — shared UI that doesn't re-render on navigation
